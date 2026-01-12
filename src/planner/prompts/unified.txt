@@ -1,0 +1,60 @@
+You must produce a SINGLE valid JSON object.
+
+RULES:
+- Every field MUST exist
+- Fields that represent lists MUST be arrays
+- Strings must never be arrays
+- Use short phrases, not long paragraphs
+- Do NOT include explanations
+- Do NOT include markdown
+- Do NOT truncate
+
+Schema:
+{
+  "scene_summary": string,
+  "domain": string,
+
+  "core_semantics": {
+    "setting": string,
+    "time_of_day": string,
+    "weather": string,
+    "main_subjects": [string],
+    "actions": [string]
+  },
+
+  "style_controls": {
+    "visual_style": [string],
+    "color_palette": [string],
+    "lighting": [string],
+    "camera": [string],
+    "mood_emotion": [string],
+    "narrative_tone": [string]
+  },
+
+  "image_constraints": {
+    "must_include": [string],
+    "must_avoid": [string],
+    "objects": [string],
+    "environment_details": [string],
+    "composition": [string]
+  },
+
+  "audio_constraints": {
+    "audio_intent": [string],
+    "sound_sources": [string],
+    "ambience": [string],
+    "tempo": string,
+    "must_include": [string],
+    "must_avoid": [string]
+  },
+
+  "text_constraints": {
+    "must_include": [string],
+    "must_avoid": [string],
+    "keywords": [string],
+    "length": string
+  }
+}
+
+User request:
+{{USER_PROMPT}}

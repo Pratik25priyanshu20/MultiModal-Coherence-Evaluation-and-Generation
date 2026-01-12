@@ -1,0 +1,32 @@
+[
+  {
+    "id": "wm_001",
+    "caption": "A futuristic city skyline with flying vehicles and ambient hum",
+    "image": "images/city_neon_01.png",
+    "audio": "audio/city_neon_01.wav"
+  },
+  {
+    "id": "wm_002",
+    "caption": "A rainy neon-lit city street at night with reflections on wet pavement.",
+    "image": "images/city01.png",
+    "audio": "audio/city01.wav"
+  },
+  {
+    "id": "wm_003",
+    "caption": "A rainy neon-lit city street at night with reflections on wet pavement.",
+    "image": "images/city_02.png",
+    "audio": "audio/city_02.wav"
+  },
+  {
+    "id": "wm_004",
+    "caption": "A dense forest during foggy morning with birds and rustling leaves",
+    "image": "images/forest_morning_fog_02.png",
+    "audio": "audio/forest_morning_fog_02.wav"
+  },
+  {
+    "id": "wm_005",
+    "caption": "A quiet beach at sunrise with soft waves and distant seagulls",
+    "image": "images/beach_waves_01.png",
+    "audio": "audio/beach_waves_01.wav"
+  }
+]

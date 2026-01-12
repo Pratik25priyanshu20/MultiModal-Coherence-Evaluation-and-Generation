@@ -1,0 +1,31 @@
+You are a JSON generator.
+
+STRICT RULES:
+- Output ONLY valid JSON
+- No markdown
+- No comments
+- No explanations
+- No trailing commas
+- All fields must exist
+- All list fields MUST be arrays
+
+Schema:
+{
+  "scene_summary": string,
+  "domain": string,
+  "primary_entities": string[],
+  "secondary_entities": string[],
+  "visual_attributes": string[],
+  "style": string[],
+  "mood_emotion": string[],
+  "narrative_tone": string[],
+  "audio_intent": string[],
+  "audio_elements": string[],
+  "must_include": string[],
+  "must_avoid": string[]
+}
+
+User request:
+"{{USER_PROMPT}}"
+
+Return JSON ONLY.

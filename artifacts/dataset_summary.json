@@ -1,0 +1,17 @@
+{
+  "num_samples": 5,
+  "base_score_mean": 0.0083,
+  "base_score_std": 0.02986857880783751,
+  "final_score_mean": 0.01542,
+  "final_score_std": 0.023935112283003813,
+  "classification_counts": {
+    "LOCAL_MODALITY_WEAKNESS": 1,
+    "HIGH_COHERENCE": 2,
+    "GLOBAL_FAILURE": 2
+  },
+  "classification_percentages": {
+    "LOCAL_MODALITY_WEAKNESS": 0.2,
+    "HIGH_COHERENCE": 0.4,
+    "GLOBAL_FAILURE": 0.4
+  }
+}

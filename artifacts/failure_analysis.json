@@ -1,0 +1,29 @@
+{
+  "weakest_metric_counts": {
+    "st_i": 2,
+    "si_a": 3
+  },
+  "average_scores_by_metric": {
+    "msci": 0.012260000000000002,
+    "st_i": 0.014299999999999998,
+    "st_a": 0.01446,
+    "si_a": -0.006959999999999997
+  },
+  "failed_samples": [
+    {
+      "id": "wm_001",
+      "classification": "LOCAL_MODALITY_WEAKNESS",
+      "weakest_metric": "st_i"
+    },
+    {
+      "id": "wm_003",
+      "classification": "GLOBAL_FAILURE",
+      "weakest_metric": "si_a"
+    },
+    {
+      "id": "wm_004",
+      "classification": "GLOBAL_FAILURE",
+      "weakest_metric": "st_i"
+    }
+  ]
+}

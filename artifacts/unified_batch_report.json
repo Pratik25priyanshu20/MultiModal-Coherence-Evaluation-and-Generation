@@ -1,0 +1,27 @@
+{
+  "num_runs": 20,
+  "mean_scores": {
+    "msci": 0.003725,
+    "st_i": -0.00022500000000000054,
+    "st_a": 0.01173,
+    "si_a": -0.014530000000000001
+  },
+  "std_scores": {
+    "msci": 0.039023606637521344,
+    "st_i": 0.05481582686597001,
+    "st_a": 0.04916334101746951,
+    "si_a": 0.03739558931211006
+  },
+  "classification_counts": {
+    "GLOBAL_FAILURE": 8,
+    "HIGH_COHERENCE": 5,
+    "LOCAL_MODALITY_WEAKNESS": 6,
+    "MODALITY_FAILURE": 1
+  },
+  "classification_percentages": {
+    "GLOBAL_FAILURE": 0.4,
+    "HIGH_COHERENCE": 0.25,
+    "LOCAL_MODALITY_WEAKNESS": 0.3,
+    "MODALITY_FAILURE": 0.05
+  }
+}

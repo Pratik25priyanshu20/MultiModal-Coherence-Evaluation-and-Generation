@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# HuggingFace / models / cache
+.cache/
+hf_cache/
+models/
+checkpoints/
+
+# Generated artifacts
+runs/
+outputs/
+*.wav
+*.png
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
