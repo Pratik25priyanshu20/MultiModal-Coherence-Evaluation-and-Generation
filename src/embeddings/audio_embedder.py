@@ -38,3 +38,14 @@ class AudioEmbedder:
         outputs = self.model.get_audio_features(**inputs)
         emb = outputs[0]
         return emb.cpu().numpy().astype("float32")
+
+    @torch.no_grad()
+    def embed_text(self, text: str) -> np.ndarray:
+        """Embed text using CLAP's text encoder (for text-audio comparison)."""
+        inputs = self.processor(
+            text=[text],
+            return_tensors="pt",
+            padding=True,
+        ).to(self.device)
+        feats = self.model.get_text_features(**inputs)[0]
+        return feats.cpu().numpy().astype("float32")

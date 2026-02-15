@@ -1,0 +1,41 @@
+======================================================================
+STATISTICAL SUPPLEMENT
+======================================================================
+
+1. NORMALITY TESTS (Shapiro-Wilk on paired differences)
+--------------------------------------------------
+
+RQ1 Skip-text:
+  baseline vs wrong_image: W = 0.9735, p = 0.6400 → Normal: Yes
+  baseline vs wrong_audio: W = 0.9458, p = 0.1301 → Normal: Yes
+
+RQ1 Full-pipeline:
+  baseline vs wrong_image: W = 0.9584, p = 0.2812 → Normal: Yes
+  baseline vs wrong_audio: W = 0.9712, p = 0.5718 → Normal: Yes
+
+RQ2 (vs direct):
+  council vs direct: W = 0.9593, p = 0.2977 → Normal: Yes
+  extended_prompt vs direct: W = 0.9274, p = 0.0420 → Normal: No
+  planner vs direct: W = 0.9697, p = 0.5322 → Normal: Yes
+
+2. WILCOXON SIGNED-RANK TESTS (non-parametric robustness check)
+--------------------------------------------------
+
+RQ1 Skip-text:
+  baseline vs wrong_image: W = 0.0, p = 1.86e-09, r_rb = 1.000, n = 30
+  baseline vs wrong_audio: W = 0.0, p = 1.86e-09, r_rb = 1.000, n = 30
+
+RQ1 Full-pipeline:
+  baseline vs wrong_image: W = 1.0, p = 3.73e-09, r_rb = 0.996, n = 30
+  baseline vs wrong_audio: W = 0.0, p = 1.86e-09, r_rb = 1.000, n = 30
+
+RQ2:
+  direct vs council: W = 171.0, p = 2.06e-01, r_rb = 0.265, n = 30
+  direct vs extended_prompt: W = 207.0, p = 6.12e-01, r_rb = 0.110, n = 30
+  direct vs planner: W = 166.0, p = 1.77e-01, r_rb = 0.286, n = 30
+
+3. HOLM-BONFERRONI CORRECTION FOR RQ2
+--------------------------------------------------
+  council vs direct: raw p = 0.2951, Holm-adjusted p = 0.8853 → not significant
+  planner vs direct: raw p = 0.3193, Holm-adjusted p = 0.8853 → not significant
+  extended_prompt vs direct: raw p = 0.9717, Holm-adjusted p = 0.9717 → not significant

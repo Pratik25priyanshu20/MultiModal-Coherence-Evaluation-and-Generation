@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Optional
 import json
 import re
 import urllib.request
+
+from src.exceptions import GenerationError
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -79,10 +84,14 @@ def _ollama_generate(
     try:
         with urllib.request.urlopen(req, timeout=600) as resp:
             data = json.loads(resp.read().decode("utf-8"))
-            return data.get("response", "").strip()
+            text = data.get("response", "").strip()
+            logger.debug("Ollama generated %d chars", len(text))
+            return text
     except Exception as e:
-        raise RuntimeError(
-            f"Ollama call failed. Is Ollama running on {host}? Error: {e}"
+        logger.error("Ollama call failed on %s: %s", host, e)
+        raise GenerationError(
+            f"Ollama call failed. Is Ollama running on {host}? Error: {e}",
+            modality="text", backend=f"ollama/{model}",
         ) from e
 
 

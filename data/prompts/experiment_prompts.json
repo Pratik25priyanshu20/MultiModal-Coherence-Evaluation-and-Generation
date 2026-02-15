@@ -1,0 +1,156 @@
+{
+  "version": "1.0",
+  "description": "30 diverse prompts for RQ1/RQ2 experiments. Spanning nature, urban, water, and mixed domains.",
+  "prompts": [
+    {
+      "id": "nat_01",
+      "text": "A peaceful forest at dawn with birdsong and morning mist",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_02",
+      "text": "A mountain meadow with wildflowers swaying in the wind",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_03",
+      "text": "A dense jungle with exotic birds calling from the canopy",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_04",
+      "text": "A foggy morning in the countryside with distant church bells",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_05",
+      "text": "A sunlit garden with buzzing bees and rustling leaves",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_06",
+      "text": "A snowy mountain peak under a clear blue winter sky",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_07",
+      "text": "A field of golden wheat under a warm summer sunset",
+      "domain": "nature"
+    },
+    {
+      "id": "nat_08",
+      "text": "A quiet woodland path with autumn leaves crunching underfoot",
+      "domain": "nature"
+    },
+    {
+      "id": "urb_01",
+      "text": "A bustling city street at night with neon lights and traffic",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_02",
+      "text": "A rainy day in a European city with cobblestone streets",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_03",
+      "text": "A crowded marketplace with vendors shouting and music playing",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_04",
+      "text": "A quiet alley in an old town with distant footsteps echoing",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_05",
+      "text": "A rooftop view of a modern skyline at golden hour",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_06",
+      "text": "A subway station with trains arriving and commuters rushing",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_07",
+      "text": "A cafe terrace on a busy boulevard with clinking glasses",
+      "domain": "urban"
+    },
+    {
+      "id": "urb_08",
+      "text": "An empty parking lot under flickering streetlights at midnight",
+      "domain": "urban"
+    },
+    {
+      "id": "wat_01",
+      "text": "Ocean waves crashing on a sandy beach at sunset",
+      "domain": "water"
+    },
+    {
+      "id": "wat_02",
+      "text": "A calm lake reflecting snow-capped mountains at dawn",
+      "domain": "water"
+    },
+    {
+      "id": "wat_03",
+      "text": "A tropical island with turquoise water and palm trees",
+      "domain": "water"
+    },
+    {
+      "id": "wat_04",
+      "text": "A river flowing through a rocky canyon with rapids",
+      "domain": "water"
+    },
+    {
+      "id": "wat_05",
+      "text": "Rain falling on a pond with ripples spreading across the surface",
+      "domain": "water"
+    },
+    {
+      "id": "wat_06",
+      "text": "A fishing boat anchored in a misty harbor at early morning",
+      "domain": "water"
+    },
+    {
+      "id": "wat_07",
+      "text": "A waterfall cascading into a lush green pool below",
+      "domain": "water"
+    },
+    {
+      "id": "mix_01",
+      "text": "A lighthouse on a cliff during a thunderstorm at night",
+      "domain": "mixed"
+    },
+    {
+      "id": "mix_02",
+      "text": "Children playing in a park fountain on a hot summer day",
+      "domain": "mixed"
+    },
+    {
+      "id": "mix_03",
+      "text": "A desert landscape with sand dunes under a blazing sun",
+      "domain": "mixed"
+    },
+    {
+      "id": "mix_04",
+      "text": "A train crossing a bridge over a deep valley at dusk",
+      "domain": "mixed"
+    },
+    {
+      "id": "mix_05",
+      "text": "A bonfire on a beach with waves and guitar music at night",
+      "domain": "mixed"
+    },
+    {
+      "id": "mix_06",
+      "text": "A hot air balloon floating over a patchwork of farm fields",
+      "domain": "mixed"
+    },
+    {
+      "id": "mix_07",
+      "text": "A stone bridge over a stream in an ancient village at twilight",
+      "domain": "mixed"
+    }
+  ]
+}

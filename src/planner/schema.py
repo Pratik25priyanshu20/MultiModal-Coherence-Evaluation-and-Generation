@@ -1,8 +1,21 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class ComplexityLevel(str, Enum):
+    low = "low"
+    medium = "medium"
+    high = "high"
+
+
+class RiskFlag(str, Enum):
+    ambiguity = "ambiguity"
+    emotional_conflict = "emotional_conflict"
+    conflicting_constraints = "conflicting_constraints"
 
 
 class CoreSemantics(BaseModel):
@@ -54,6 +67,9 @@ class UnifiedPlan(BaseModel):
     image_constraints: ImageConstraints
     audio_constraints: AudioConstraints
     text_constraints: TextConstraints
+    complexity_level: ComplexityLevel = ComplexityLevel.low
+    risk_flags: List[RiskFlag] = Field(default_factory=list)
+    notes: str | None = None
 
 
 SemanticPlan = UnifiedPlan
