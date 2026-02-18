@@ -51,7 +51,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -524,6 +524,93 @@ class BridgeTrainer:
 # ═══════════════════════════════════════════════════════════════
 # COHERENCE ENGINE INTEGRATION (future use)
 # ═══════════════════════════════════════════════════════════════
+
+
+def build_domain_matched_dataset(
+    image_index_path: str = "data/embeddings/image_index.npz",
+    audio_index_path: str = "data/embeddings/audio_index.npz",
+) -> ImageAudioPairDataset:
+    """
+    Build paired training data via weak domain supervision.
+
+    Pairs every image with every same-domain audio file:
+        nature images × nature audio → nature pairs
+        urban images × urban audio → urban pairs
+        water images × water audio → water pairs
+
+    Expected yield (~1,000+ pairs):
+        5 nature imgs × 22 nature audio = 110
+        23 urban imgs × 28 urban audio = 644
+        9 water imgs × 33 water audio = 297
+        Total: ~1,051 pairs
+
+    These are "weakly supervised" — same domain, not exact scene matches.
+    Sufficient for learning a rough bridge alignment.
+
+    Args:
+        image_index_path: Path to image embedding index (.npz)
+        audio_index_path: Path to audio embedding index (.npz)
+
+    Returns:
+        ImageAudioPairDataset ready for bridge training
+    """
+    _check_torch()
+
+    img_index = np.load(image_index_path, allow_pickle=True)
+    aud_index = np.load(audio_index_path, allow_pickle=True)
+
+    img_paths = list(img_index["paths"])
+    img_embeddings = img_index["embeddings"]
+    img_domains = list(img_index.get("domains", []))
+
+    aud_paths = list(aud_index["paths"])
+    aud_embeddings = aud_index["embeddings"]
+    aud_domains = list(aud_index.get("domains", []))
+
+    # Infer domains from paths if not stored in index
+    def _infer_domain(path_str: str) -> str:
+        p = str(path_str).lower()
+        for domain in ["nature", "urban", "water"]:
+            if f"/{domain}/" in p or f"_{domain}" in p:
+                return domain
+        return "other"
+
+    if not img_domains or len(img_domains) != len(img_paths):
+        img_domains = [_infer_domain(p) for p in img_paths]
+    if not aud_domains or len(aud_domains) != len(aud_paths):
+        aud_domains = [_infer_domain(p) for p in aud_paths]
+
+    # Build cross-product pairs within each domain
+    image_embs_list: List[np.ndarray] = []
+    audio_embs_list: List[np.ndarray] = []
+    pair_counts: Dict[str, int] = {}
+
+    for domain in ["nature", "urban", "water"]:
+        img_indices = [i for i, d in enumerate(img_domains) if d == domain]
+        aud_indices = [i for i, d in enumerate(aud_domains) if d == domain]
+
+        n_pairs = len(img_indices) * len(aud_indices)
+        pair_counts[domain] = n_pairs
+
+        for ii in img_indices:
+            for ai in aud_indices:
+                image_embs_list.append(img_embeddings[ii])
+                audio_embs_list.append(aud_embeddings[ai])
+
+    total = sum(pair_counts.values())
+    logger.info(
+        "Domain-matched pairs: %s = %d total",
+        ", ".join(f"{d}={n}" for d, n in pair_counts.items()),
+        total,
+    )
+
+    if total == 0:
+        raise ValueError("No domain-matched pairs found. Check embedding indexes and domain labels.")
+
+    return ImageAudioPairDataset(
+        image_embeddings=np.array(image_embs_list),
+        audio_embeddings=np.array(audio_embs_list),
+    )
 
 
 def build_paired_dataset_from_runs(

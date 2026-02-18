@@ -469,32 +469,70 @@ def analyze_rq2(results: List[Dict[str, Any]], alpha: float = 0.05) -> Dict[str,
     }
 
 
+def analyze_one_file(filepath: str, alpha: float = 0.05) -> Dict[str, Any]:
+    """Analyze a single results file and return the analysis dict."""
+    data = load_results(filepath)
+    experiment = data.get("experiment", "")
+    results = data.get("results", [])
+
+    print(f"\nLoaded {len(results)} results from: {filepath}")
+    print(f"Experiment: {experiment}")
+    print(f"Config: {json.dumps(data.get('config', {}), indent=2)}")
+
+    if "RQ1" in experiment or "condition" in results[0]:
+        return analyze_rq1(results, alpha=alpha)
+    elif "RQ2" in experiment or "mode" in results[0]:
+        return analyze_rq2(results, alpha=alpha)
+    else:
+        if any(r.get("condition") for r in results):
+            return analyze_rq1(results, alpha=alpha)
+        else:
+            return analyze_rq2(results, alpha=alpha)
+
+
+# Default result files to analyze with --all
+ALL_RESULT_FILES = [
+    "runs/rq1_full/rq1_results.json",
+    "runs/rq1_gen/rq1_gen_results.json",
+    "runs/rq1_hybrid/rq1_hybrid_results.json",
+    "runs/rq2/rq2_results.json",
+    "runs/rq2_hybrid/rq2_hybrid_results.json",
+]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Analyze RQ1/RQ2 experiment results")
-    parser.add_argument("results_file", help="Path to results JSON (rq1_results.json or rq2_results.json)")
+    parser.add_argument("results_file", nargs="?", help="Path to results JSON (rq1_results.json or rq2_results.json)")
+    parser.add_argument("--all", action="store_true", help="Analyze all experiment result files at once")
     parser.add_argument("--alpha", type=float, default=0.05, help="Significance level")
     parser.add_argument("--out", help="Save analysis to JSON file")
     args = parser.parse_args()
 
-    data = load_results(args.results_file)
-    experiment = data.get("experiment", "")
-    results = data.get("results", [])
+    if args.all:
+        project_root = Path(__file__).resolve().parent.parent
+        found = 0
+        for relpath in ALL_RESULT_FILES:
+            fullpath = project_root / relpath
+            if fullpath.exists():
+                found += 1
+                print("\n" + "=" * 80)
+                print(f"  [{found}] {relpath}")
+                print("=" * 80)
+                analyze_one_file(str(fullpath), alpha=args.alpha)
+            else:
+                print(f"\n  [SKIP] {relpath} — file not found")
+        if found == 0:
+            print("No result files found. Run experiments first.")
+            return 1
+        print("\n" + "=" * 80)
+        print(f"  Done: analyzed {found} result files")
+        print("=" * 80)
+        return 0
 
-    print(f"\nLoaded {len(results)} results from: {args.results_file}")
-    print(f"Experiment: {experiment}")
-    print(f"Config: {json.dumps(data.get('config', {}), indent=2)}")
+    if not args.results_file:
+        parser.error("either provide a results_file or use --all")
 
-    # Detect RQ type
-    if "RQ1" in experiment or "condition" in results[0]:
-        analysis = analyze_rq1(results, alpha=args.alpha)
-    elif "RQ2" in experiment or "mode" in results[0]:
-        analysis = analyze_rq2(results, alpha=args.alpha)
-    else:
-        # Try both if ambiguous
-        if any(r.get("condition") for r in results):
-            analysis = analyze_rq1(results, alpha=args.alpha)
-        else:
-            analysis = analyze_rq2(results, alpha=args.alpha)
+    analysis = analyze_one_file(args.results_file, alpha=args.alpha)
 
     if args.out:
         out_path = Path(args.out)

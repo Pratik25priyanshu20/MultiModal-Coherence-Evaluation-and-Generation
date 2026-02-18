@@ -120,6 +120,19 @@ class HybridImageGenerator:
 
         logger.warning("All SD models failed to load. Will use retrieval fallback.")
 
+    def unload(self) -> None:
+        """Free GPU/MPS memory by deleting the SD pipeline. Critical for 16GB RAM constraint."""
+        if self._sd_pipe is not None:
+            del self._sd_pipe
+            self._sd_pipe = None
+            if self._torch is not None:
+                if self._torch.cuda.is_available():
+                    self._torch.cuda.empty_cache()
+                elif hasattr(self._torch.backends, "mps") and self._torch.backends.mps.is_available():
+                    self._torch.mps.empty_cache()
+            import gc
+            gc.collect()
+
     def _get_retrieval_generator(self):
         """Lazy-load retrieval generator."""
         if self._retrieval_generator is None:
@@ -165,7 +178,9 @@ class HybridImageGenerator:
 
         generator = None
         if seed is not None and self._torch is not None:
-            generator = self._torch.Generator(device=self.device).manual_seed(seed)
+            # MPS generator must be created on CPU
+            gen_device = "cpu" if self.device == "mps" else self.device
+            generator = self._torch.Generator(device=gen_device).manual_seed(seed)
 
         kwargs = {
             "prompt": prompt,

@@ -3,13 +3,13 @@
 Generate publication-quality figures + statistical refinements for the paper.
 
 Outputs:
-  figures/fig1_rq1_raincloud.pdf          — Raincloud plot: MSCI by perturbation condition
-  figures/fig2_rq1_paired_slopes.pdf      — Paired slope (spaghetti) plot: per-prompt trajectories
-  figures/fig3_rq2_estimation.pdf         — Gardner-Altman estimation plot: planning modes vs direct
-  figures/fig4_forest_plot.pdf            — Forest plot: all effect sizes + CIs at a glance
-  figures/fig5_rq1_channel_decomposition.pdf — Stacked bar: text-image vs text-audio channel breakdown
-  figures/fig6_rq1_domain_heatmap.pdf     — Heatmap: MSCI by prompt domain × condition
-  figures/fig7_rq2_power_curve.pdf        — Power curve: detectable effect sizes at N=30
+  figures/fig1_rq1_raincloud_f.pdf          — Raincloud plot: MSCI by perturbation condition
+  figures/fig2_rq1_paired_slopes_f.pdf      — Paired slope (spaghetti) plot: per-prompt trajectories
+  figures/fig3_rq2_estimation_f.pdf         — Gardner-Altman estimation plot: planning modes vs direct
+  figures/fig4_forest_plot_f.pdf            — Forest plot: all effect sizes + CIs at a glance
+  figures/fig5_rq1_channel_decomposition_f.pdf — Stacked bar: text-image vs text-audio channel breakdown
+  figures/fig6_rq1_domain_heatmap_f.pdf     — Heatmap: MSCI by prompt domain × condition
+  figures/fig7_rq2_power_curve_f.pdf        — Power curve: detectable effect sizes at N=30
   figures/statistical_supplement.txt      — Normality tests, Wilcoxon backup, Holm-Bonferroni RQ2
 """
 
@@ -272,10 +272,10 @@ add_bracket(ax, 0, 2, ymax + 0.08, "***\nd = 3.64", h=0.008)
 
 ax.set_ylim(0, ymax + 0.16)
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig1_rq1_raincloud.pdf")
-fig.savefig(FIG_DIR / "fig1_rq1_raincloud.png")
+fig.savefig(FIG_DIR / "fig1_rq1_raincloud_f.pdf")
+fig.savefig(FIG_DIR / "fig1_rq1_raincloud_f.png")
 plt.close(fig)
-print(f"  → Saved: fig1_rq1_raincloud.pdf/png")
+print(f"  → Saved: fig1_rq1_raincloud_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -322,10 +322,10 @@ for ax_idx, (perturb, perturb_label, d_val) in enumerate([
 axes[0].set_ylabel("MSCI")
 fig.suptitle("RQ1: Per-Prompt MSCI Change Under Perturbation", fontsize=13, y=1.02)
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig2_rq1_paired_slopes.pdf")
-fig.savefig(FIG_DIR / "fig2_rq1_paired_slopes.png")
+fig.savefig(FIG_DIR / "fig2_rq1_paired_slopes_f.pdf")
+fig.savefig(FIG_DIR / "fig2_rq1_paired_slopes_f.png")
 plt.close(fig)
-print(f"  → Saved: fig2_rq1_paired_slopes.pdf/png")
+print(f"  → Saved: fig2_rq1_paired_slopes_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -395,10 +395,10 @@ for ax_idx, (mode, color, label) in enumerate([
 
 fig.suptitle("RQ2: Planning Mode Differences (Gardner-Altman Estimation)", fontsize=13, y=1.02)
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig3_rq2_estimation.pdf")
-fig.savefig(FIG_DIR / "fig3_rq2_estimation.png")
+fig.savefig(FIG_DIR / "fig3_rq2_estimation_f.pdf")
+fig.savefig(FIG_DIR / "fig3_rq2_estimation_f.png")
 plt.close(fig)
-print(f"  → Saved: fig3_rq2_estimation.pdf/png")
+print(f"  → Saved: fig3_rq2_estimation_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -417,15 +417,20 @@ effects = [
     ("RQ1 skip: vs Wrong Audio", 3.64, 30, "RQ1"),
     ("RQ1 full: vs Wrong Image", 2.11, 30, "RQ1"),
     ("RQ1 full: vs Wrong Audio", 2.78, 30, "RQ1"),
+    ("RQ1-gen: vs Wrong Image", 4.52, 30, "RQ1-gen"),
+    ("RQ1-gen: vs Wrong Audio", 2.02, 30, "RQ1-gen"),
     ("RQ2: Council vs Direct", -0.19, 30, "RQ2"),
     ("RQ2: Ext. Prompt vs Direct", 0.01, 30, "RQ2"),
     ("RQ2: Planner vs Direct", -0.18, 30, "RQ2"),
+    ("RQ2-gen: Planner vs Direct", -0.82, 10, "RQ2-gen"),
+    ("RQ2-gen: Council vs Direct", -1.40, 10, "RQ2-gen"),
+    ("RQ2-gen: Ext. Prompt vs Direct", -1.51, 10, "RQ2-gen"),
 ]
 
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plt.subplots(figsize=(8, 7.5))
 
 y_positions = list(range(len(effects)))[::-1]
-group_colors = {"RQ1": "#2ecc71", "RQ2": "#3498db"}
+group_colors = {"RQ1": "#2ecc71", "RQ1-gen": "#e67e22", "RQ2": "#3498db", "RQ2-gen": "#e74c3c"}
 
 for i, (label, d, n, group) in enumerate(effects):
     y = y_positions[i]
@@ -434,7 +439,7 @@ for i, (label, d, n, group) in enumerate(effects):
 
     ax.errorbar(d, y, xerr=[[d - lo], [hi - d]], fmt="o", markersize=8,
                 color=color, capsize=4, capthick=1.2, linewidth=1.5, zorder=3)
-    ax.text(-1.2, y, label, ha="right", va="center", fontsize=9)
+    ax.text(-2.9, y, label, ha="right", va="center", fontsize=9)
 
 # Zero line
 ax.axvline(0, color="black", linewidth=0.8, linestyle="-", zorder=1)
@@ -447,24 +452,28 @@ ax.axvline(0.5, color="#bdc3c7", linewidth=0.5, linestyle=":", zorder=0)
 ax.text(0.5, len(effects) - 0.3, "medium", ha="center", fontsize=7, color="#999")
 ax.text(0.8, len(effects) - 0.3, "large", ha="center", fontsize=7, color="#999")
 
-# Separator between RQ1 and RQ2
-ax.axhline(2.5, color="#bdc3c7", linewidth=0.5, linestyle="-")
+# Separators between groups
+ax.axhline(7.5, color="#bdc3c7", linewidth=0.5, linestyle="-")  # RQ1 vs RQ1-gen
+ax.axhline(5.5, color="#bdc3c7", linewidth=0.5, linestyle="-")  # RQ1-gen vs RQ2
+ax.axhline(2.5, color="#bdc3c7", linewidth=0.5, linestyle="-")  # RQ2 vs RQ2-gen
 
 ax.set_yticks([])
 ax.set_xlabel("Cohen's d [95% CI]")
 ax.set_title("Forest Plot: Effect Sizes Across All Comparisons")
-ax.set_xlim(-1.3, 5.2)
+ax.set_xlim(-3.0, 6.5)
 
 # Legend
-patches = [mpatches.Patch(color=group_colors["RQ1"], label="RQ1 (Perturbation)"),
-           mpatches.Patch(color=group_colors["RQ2"], label="RQ2 (Planning)")]
+patches = [mpatches.Patch(color=group_colors["RQ1"], label="RQ1 Retrieval"),
+           mpatches.Patch(color=group_colors["RQ1-gen"], label="RQ1 Generative (Hybrid)"),
+           mpatches.Patch(color=group_colors["RQ2"], label="RQ2 Planning (Retrieval)"),
+           mpatches.Patch(color=group_colors["RQ2-gen"], label="RQ2 Planning (Generative)")]
 ax.legend(handles=patches, loc="lower right", frameon=True, framealpha=0.9)
 
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig4_forest_plot.pdf")
-fig.savefig(FIG_DIR / "fig4_forest_plot.png")
+fig.savefig(FIG_DIR / "fig4_forest_plot_f.pdf")
+fig.savefig(FIG_DIR / "fig4_forest_plot_f.png")
 plt.close(fig)
-print(f"  → Saved: fig4_forest_plot.pdf/png")
+print(f"  → Saved: fig4_forest_plot_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -508,10 +517,10 @@ ax.legend(loc="upper right")
 ax.set_ylim(0, 1.05)
 
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig5_rq1_channel_decomposition.pdf")
-fig.savefig(FIG_DIR / "fig5_rq1_channel_decomposition.png")
+fig.savefig(FIG_DIR / "fig5_rq1_channel_decomposition_f.pdf")
+fig.savefig(FIG_DIR / "fig5_rq1_channel_decomposition_f.png")
 plt.close(fig)
-print(f"  → Saved: fig5_rq1_channel_decomposition.pdf/png")
+print(f"  → Saved: fig5_rq1_channel_decomposition_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -533,10 +542,10 @@ ax.set_ylabel("Domain")
 ax.set_xlabel("Condition")
 
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig6_rq1_domain_heatmap.pdf")
-fig.savefig(FIG_DIR / "fig6_rq1_domain_heatmap.png")
+fig.savefig(FIG_DIR / "fig6_rq1_domain_heatmap_f.pdf")
+fig.savefig(FIG_DIR / "fig6_rq1_domain_heatmap_f.png")
 plt.close(fig)
-print(f"  → Saved: fig6_rq1_domain_heatmap.pdf/png")
+print(f"  → Saved: fig6_rq1_domain_heatmap_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -596,10 +605,10 @@ ax.set_xlim(0, 1.5)
 ax.set_ylim(0, 1.02)
 
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig7_rq2_power_curve.pdf")
-fig.savefig(FIG_DIR / "fig7_rq2_power_curve.png")
+fig.savefig(FIG_DIR / "fig7_rq2_power_curve_f.pdf")
+fig.savefig(FIG_DIR / "fig7_rq2_power_curve_f.png")
 plt.close(fig)
-print(f"  → Saved: fig7_rq2_power_curve.pdf/png")
+print(f"  → Saved: fig7_rq2_power_curve_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -646,10 +655,10 @@ for ax_idx, (perturb, label, color) in enumerate([
 
 fig.suptitle("RQ1: Bootstrap Distributions of Mean MSCI Differences (10,000 resamples)", fontsize=12, y=1.02)
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig8_rq1_bootstrap.pdf")
-fig.savefig(FIG_DIR / "fig8_rq1_bootstrap.png")
+fig.savefig(FIG_DIR / "fig8_rq1_bootstrap_f.pdf")
+fig.savefig(FIG_DIR / "fig8_rq1_bootstrap_f.png")
 plt.close(fig)
-print(f"  → Saved: fig8_rq1_bootstrap.pdf/png")
+print(f"  → Saved: fig8_rq1_bootstrap_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -693,10 +702,10 @@ ax.legend()
 ax.set_ylim(0, 0.52)
 
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig9_rq1_robustness.pdf")
-fig.savefig(FIG_DIR / "fig9_rq1_robustness.png")
+fig.savefig(FIG_DIR / "fig9_rq1_robustness_f.pdf")
+fig.savefig(FIG_DIR / "fig9_rq1_robustness_f.png")
 plt.close(fig)
-print(f"  → Saved: fig9_rq1_robustness.pdf/png")
+print(f"  → Saved: fig9_rq1_robustness_f.pdf/png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -743,10 +752,114 @@ ax.set_xlim(0, 0.15)
 
 fig.suptitle("Reproducibility: Within-Prompt Variance Across Random Seeds", fontsize=12, y=1.02)
 fig.tight_layout()
-fig.savefig(FIG_DIR / "fig10_seed_stability.pdf")
-fig.savefig(FIG_DIR / "fig10_seed_stability.png")
+fig.savefig(FIG_DIR / "fig10_seed_stability_f.pdf")
+fig.savefig(FIG_DIR / "fig10_seed_stability_f.png")
 plt.close(fig)
-print(f"  → Saved: fig10_seed_stability.pdf/png")
+print(f"  → Saved: fig10_seed_stability_f.pdf/png")
+
+
+# ═══════════════════════════════════════════════════════════
+# FIGURE 11: Retrieval vs Generation Comparison (if data exists)
+# ═══════════════════════════════════════════════════════════
+# Prefer hybrid results over pure generative
+rq1_gen_path = ROOT / "runs/rq1_hybrid/rq1_hybrid_results.json"
+if not rq1_gen_path.exists():
+    rq1_gen_path = ROOT / "runs/rq1_gen/rq1_gen_results.json"
+if rq1_gen_path.exists():
+    print("[Fig 13] Retrieval vs Generation comparison...")
+
+    rq1_gen = load_rq1(rq1_gen_path)
+    rq1_gen_agg = rq1_gen.groupby(["prompt_id", "domain", "condition"]).mean(numeric_only=True).reset_index()
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Panel A: Side-by-side MSCI by condition
+    ax = axes[0]
+    cond_keys_list = ["baseline", "wrong_image", "wrong_audio"]
+    cond_labels = ["Baseline", "Wrong Image", "Wrong Audio"]
+    cond_colors = [PAL_RQ1[c] for c in cond_labels]
+
+    means_ret = [rq1_skip_agg[rq1_skip_agg["condition"] == ck]["msci"].mean() for ck in cond_keys_list]
+    means_gen = [rq1_gen_agg[rq1_gen_agg["condition"] == ck]["msci"].mean() for ck in cond_keys_list]
+    sems_ret = [rq1_skip_agg[rq1_skip_agg["condition"] == ck]["msci"].sem() for ck in cond_keys_list]
+    sems_gen = [rq1_gen_agg[rq1_gen_agg["condition"] == ck]["msci"].sem() for ck in cond_keys_list]
+
+    x = np.arange(len(cond_labels))
+    width = 0.35
+
+    bars1 = ax.bar(x - width/2, means_ret, width, yerr=sems_ret, capsize=4,
+                   color=cond_colors, alpha=0.9, edgecolor="black", linewidth=0.5, label="Retrieval")
+    bars2 = ax.bar(x + width/2, means_gen, width, yerr=sems_gen, capsize=4,
+                   color=cond_colors, alpha=0.5, edgecolor="black", linewidth=0.5,
+                   hatch="///", label="Generative")
+
+    for bar_group, means in [(bars1, means_ret), (bars2, means_gen)]:
+        for bar, val in zip(bar_group, means):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.008,
+                    f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(cond_labels)
+    ax.set_ylabel("MSCI (mean ± SE)")
+    ax.set_title("(a) Mean MSCI by Condition")
+    ax.legend(loc="upper right")
+    ax.set_ylim(0, max(max(means_ret), max(means_gen)) * 1.35)
+
+    # Panel B: Effect size comparison
+    ax = axes[1]
+
+    def _compute_d(df_agg, baseline_cond, perturb_cond):
+        base = df_agg[df_agg["condition"] == baseline_cond].set_index("prompt_id")["msci"]
+        pert = df_agg[df_agg["condition"] == perturb_cond].set_index("prompt_id")["msci"]
+        common = base.index.intersection(pert.index)
+        diff = (base.loc[common] - pert.loc[common]).values
+        if len(diff) == 0 or np.std(diff) == 0:
+            return 0.0, len(diff)
+        return float(np.mean(diff) / np.std(diff)), len(diff)
+
+    comparisons = [
+        ("vs Wrong Image", "wrong_image"),
+        ("vs Wrong Audio", "wrong_audio"),
+    ]
+
+    y_pos = np.arange(len(comparisons) * 2)
+    labels = []
+    d_vals = []
+    colors_bar = []
+
+    for ci, (label, perturb) in enumerate(comparisons):
+        d_ret, n_ret = _compute_d(rq1_skip_agg, "baseline", perturb)
+        d_gen, n_gen = _compute_d(rq1_gen_agg, "baseline", perturb)
+
+        labels.extend([f"Retrieval: {label}", f"Generative: {label}"])
+        d_vals.extend([d_ret, d_gen])
+        colors_bar.extend(["#2ecc71", "#e67e22"])
+
+    y_pos = np.arange(len(labels))[::-1]
+
+    for i, (d, lbl, col) in enumerate(zip(d_vals, labels, colors_bar)):
+        se = np.sqrt(1/30 + d**2 / 60)
+        z = 1.96
+        ax.barh(y_pos[i], d, color=col, alpha=0.7, edgecolor="black", linewidth=0.5, height=0.6)
+        ax.errorbar(d, y_pos[i], xerr=z*se, fmt="none", ecolor="black", capsize=3, linewidth=1.0)
+        ax.text(d + z*se + 0.1, y_pos[i], f"d = {d:.2f}", va="center", fontsize=9)
+
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(labels, fontsize=9)
+    ax.axvline(0, color="black", linewidth=0.8)
+    ax.axvline(0.8, color="#bdc3c7", linewidth=0.5, linestyle=":", zorder=0)
+    ax.text(0.8, max(y_pos) + 0.5, "large", ha="center", fontsize=8, color="#999")
+    ax.set_xlabel("Cohen's d [95% CI]")
+    ax.set_title("(b) Effect Sizes: Retrieval vs Generative")
+
+    fig.suptitle("RQ1: Retrieval vs Generative Mode Comparison", fontsize=13, y=1.02)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "fig13_retrieval_vs_generation_f.pdf")
+    fig.savefig(FIG_DIR / "fig13_retrieval_vs_generation_f.png")
+    plt.close(fig)
+    print(f"  → Saved: fig13_retrieval_vs_generation_f.pdf/png")
+else:
+    print("\n[Fig 13] Skipped — no generative results found at runs/rq1_gen/rq1_gen_results.json")
 
 
 print("\n" + "=" * 60)

@@ -4,7 +4,11 @@ Audio generator with explicit backend tracking.
 Phase 2: Stability over realism.
 - Backend is always recorded (never ambiguous)
 - Fallback ambient is the deterministic baseline
-- AudioLDM used only if explicitly available and stable
+- AudioLDM 2 used only if explicitly available and stable
+
+Upgrade note: AudioLDM 1 → AudioLDM 2 (cvssp/audioldm2)
+- Better audio quality, same API surface
+- unload() method added for sequential model loading within 16GB RAM
 """
 
 from __future__ import annotations
@@ -21,7 +25,7 @@ from pathlib import Path
 class AudioGenResult:
     """Result of audio generation with full metadata."""
     audio_path: str
-    backend: str  # "audioldm" or "fallback_ambient" — always explicit
+    backend: str  # "audioldm2" or "fallback_ambient" — always explicit
     prompt_hash: int  # Deterministic hash of (prompt, seed) for reproducibility
     duration_sec: float
     sample_rate: int
@@ -37,7 +41,7 @@ class AudioGenerator:
 
     Strategy (Phase 2B):
     - Default: fallback_ambient (fully deterministic, always works)
-    - Optional: AudioLDM (if force_audioldm=True and model is available)
+    - Optional: AudioLDM 2 (if force_audioldm=True and model is available)
 
     The fallback ambient generator produces prompt-seeded ambient soundscapes.
     This is acceptable for a case study testing alignment behavior, not audio realism.
@@ -52,13 +56,16 @@ class AudioGenerator:
 
         if force_audioldm:
             try:
-                from diffusers import AudioLDMPipeline
+                from diffusers import AudioLDM2Pipeline
                 import torch
 
-                model_id = "cvssp/audioldm"
-                self._audioldm_pipe = AudioLDMPipeline.from_pretrained(model_id)
+                model_id = "cvssp/audioldm2"
+                self._audioldm_pipe = AudioLDM2Pipeline.from_pretrained(
+                    model_id,
+                    torch_dtype=torch.float16 if device != "cpu" else torch.float32,
+                )
                 self._audioldm_pipe.to(self.device)
-                self._audioldm_backend_name = f"AudioLDMPipeline({model_id})"
+                self._audioldm_backend_name = f"AudioLDM2Pipeline({model_id})"
                 self._torch = torch
             except Exception as exc:
                 self._audioldm_error = str(exc)
@@ -92,13 +99,28 @@ class AudioGenerator:
             note=self._audioldm_error or "Using deterministic fallback (default)",
         )
 
+    def unload(self) -> None:
+        """Free GPU/MPS memory by deleting the pipeline. Critical for 16GB RAM constraint."""
+        if self._audioldm_pipe is not None:
+            del self._audioldm_pipe
+            self._audioldm_pipe = None
+            if self._torch is not None:
+                if self._torch.cuda.is_available():
+                    self._torch.cuda.empty_cache()
+                elif hasattr(self._torch.backends, "mps") and self._torch.backends.mps.is_available():
+                    self._torch.mps.empty_cache()
+            import gc
+            gc.collect()
+
     def _generate_audioldm(
         self, prompt: str, out_path: str, duration_sec: float, sr: int, seed: Optional[int],
     ) -> AudioGenResult:
-        """Generate with AudioLDM."""
+        """Generate with AudioLDM 2."""
         generator = None
         if seed is not None and self._torch is not None:
-            generator = self._torch.Generator(device=self.device).manual_seed(seed)
+            # MPS generator must be created on CPU then used
+            gen_device = "cpu" if self.device == "mps" else self.device
+            generator = self._torch.Generator(device=gen_device).manual_seed(seed)
         kwargs = {"audio_length_in_s": duration_sec}
         if generator is not None:
             kwargs["generator"] = generator
@@ -109,7 +131,7 @@ class AudioGenerator:
         prompt_hash = abs(hash((prompt, seed))) % (2**32)
         return AudioGenResult(
             audio_path=out_path,
-            backend="audioldm",
+            backend="audioldm2",
             prompt_hash=prompt_hash,
             duration_sec=duration_sec,
             sample_rate=sr,
