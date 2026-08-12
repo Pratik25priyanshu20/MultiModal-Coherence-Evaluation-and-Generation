@@ -63,3 +63,8 @@ Architectural, design, and strategic decisions made throughout the project.
 - Install: `pip install "cmsci @ git+<repo-url>#subdirectory=cmsci-package"`
 - Root .gitignore got negation rules so bundled assets are not excluded by `models/` pattern
 - v2 (Gemini) intentionally NOT in v0.1 package — v1 CLIP+CLAP pipeline only
+
+## PyPI Release (2026-08-12)
+- cmsci v0.1.0 published: https://pypi.org/project/cmsci/ — `pip install cmsci`
+- Live install verified (package + all bundled assets)
+- combined_training_v2.npz (197MB) excluded from git — exceeds GitHub 100MB limit; superseded by v3 anyway
