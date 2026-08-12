@@ -26,12 +26,18 @@ import streamlit as st
 # Paths
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SAMPLES_PATH = PROJECT_ROOT / "runs" / "rq3" / "rq3_samples.json"
-SESSIONS_DIR = PROJECT_ROOT / "runs" / "rq3" / "sessions"
 
 # Add project root to sys.path so we can import src.*
 import sys
 sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.config.settings import (
+    RQ3_SAMPLES_PATH, RQ3_SAMPLES_EXTENDED_PATH, RQ3_SESSIONS_DIR,
+)
+
+# Use extended samples if available, otherwise fall back to original
+SAMPLES_PATH = RQ3_SAMPLES_EXTENDED_PATH if RQ3_SAMPLES_EXTENDED_PATH.exists() else RQ3_SAMPLES_PATH
+SESSIONS_DIR = RQ3_SESSIONS_DIR
 
 from src.evaluation.human_eval_schema import (
     CoherenceRubric,

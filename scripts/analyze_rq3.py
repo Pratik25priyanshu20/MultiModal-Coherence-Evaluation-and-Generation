@@ -6,6 +6,7 @@ Aggregates multi-rater evaluation sessions and computes:
 - Inter-rater reliability (Krippendorff's alpha)
 - Intra-rater reliability per evaluator (Cohen's kappa)
 - Spearman correlation between mean human score and MSCI
+- Spearman correlation between mean human score and cMSCI (Variant D)
 - Per-condition breakdown
 - RQ3 verdict
 
@@ -34,8 +35,21 @@ from src.evaluation.human_eval_analyzer import (
     compute_multi_rater_msci_correlation,
 )
 
-SAMPLES_PATH = PROJECT_ROOT / "runs" / "rq3" / "rq3_samples.json"
-SESSION_DIR = PROJECT_ROOT / "runs" / "rq3" / "sessions"
+from src.coherence.cmsci_engine import CalibratedCoherenceEngine
+from src.config.settings import (
+    BRIDGE_WEIGHTS_PATH,
+    CMSCI_CALIBRATION_PATH,
+    EXMCR_WEIGHTS_PATH,
+    PROB_CLIP_ADAPTER_PATH,
+    PROB_CLAP_ADAPTER_PATH,
+    RQ3_SAMPLES_PATH,
+    RQ3_SAMPLES_EXTENDED_PATH,
+    RQ3_SESSIONS_DIR,
+)
+
+# Use extended samples if available, otherwise fall back to original
+SAMPLES_PATH = RQ3_SAMPLES_EXTENDED_PATH if RQ3_SAMPLES_EXTENDED_PATH.exists() else RQ3_SAMPLES_PATH
+SESSION_DIR = RQ3_SESSIONS_DIR
 OUTPUT_PATH = PROJECT_ROOT / "runs" / "rq3" / "rq3_analysis.json"
 
 
@@ -63,6 +77,112 @@ def load_sample_msci() -> dict:
     with open(SAMPLES_PATH) as f:
         data = json.load(f)
     return {s["sample_id"]: s["msci"] for s in data["samples"]}
+
+
+def compute_cmsci_scores(samples: list) -> dict:
+    """Evaluate all RQ3 samples with CalibratedCoherenceEngine (all available models)."""
+    cal_path = str(CMSCI_CALIBRATION_PATH) if CMSCI_CALIBRATION_PATH.exists() else None
+    engine = CalibratedCoherenceEngine(
+        calibration_path=cal_path,
+        exmcr_weights_path=str(EXMCR_WEIGHTS_PATH) if EXMCR_WEIGHTS_PATH.exists() else None,
+        bridge_path=str(BRIDGE_WEIGHTS_PATH) if BRIDGE_WEIGHTS_PATH.exists() else None,
+        prob_clip_adapter_path=str(PROB_CLIP_ADAPTER_PATH) if PROB_CLIP_ADAPTER_PATH.exists() else None,
+        prob_clap_adapter_path=str(PROB_CLAP_ADAPTER_PATH) if PROB_CLAP_ADAPTER_PATH.exists() else None,
+    )
+
+    scores = {}
+    for s in samples:
+        try:
+            result = engine.evaluate(
+                text=s["prompt_text"],
+                image_path=s.get("image_path"),
+                audio_path=s.get("audio_path"),
+                domain=s.get("domain", ""),
+            )
+            scores[s["sample_id"]] = result
+        except Exception as e:
+            print(f"  cMSCI error for {s['sample_id']}: {e}")
+    return scores
+
+
+def compute_cmsci_human_correlation(
+    sessions, cmsci_scores: dict
+) -> dict:
+    """Compute Spearman correlation between cMSCI and aggregated human scores."""
+    aggregated = aggregate_multi_rater_sessions(sessions)
+
+    human_vals = []
+    cmsci_vals = []
+
+    for sample_id, agg in aggregated.items():
+        if sample_id in cmsci_scores and cmsci_scores[sample_id].get("cmsci") is not None:
+            human_vals.append(agg["weighted_score"]["mean"])
+            cmsci_vals.append(cmsci_scores[sample_id]["cmsci"])
+
+    if len(human_vals) < 5:
+        return {"error": "Too few paired samples", "n_paired": len(human_vals)}
+
+    human_arr = np.array(human_vals)
+    cmsci_arr = np.array(cmsci_vals)
+
+    spearman = stats.spearmanr(cmsci_arr, human_arr)
+    pearson = stats.pearsonr(cmsci_arr, human_arr)
+
+    # Bootstrap 95% CI for Spearman rho
+    rng = np.random.default_rng(42)
+    boot_rhos = []
+    for _ in range(10000):
+        idx = rng.choice(len(human_arr), size=len(human_arr), replace=True)
+        r, _ = stats.spearmanr(cmsci_arr[idx], human_arr[idx])
+        boot_rhos.append(r)
+    ci_lower = float(np.percentile(boot_rhos, 2.5))
+    ci_upper = float(np.percentile(boot_rhos, 97.5))
+
+    return {
+        "n_paired": len(human_vals),
+        "spearman_rho": round(float(spearman.correlation), 4),
+        "spearman_p": float(spearman.pvalue),
+        "spearman_95ci": [round(ci_lower, 4), round(ci_upper, 4)],
+        "pearson_r": round(float(pearson.statistic), 4),
+        "pearson_p": float(pearson.pvalue),
+    }
+
+
+def compute_variant_correlations(
+    sessions, cmsci_scores: dict
+) -> dict:
+    """Compute Spearman correlation for each cMSCI variant against human scores."""
+    aggregated = aggregate_multi_rater_sessions(sessions)
+
+    variant_keys = [
+        "A_msci", "B_gram", "C_gram_znorm",
+        "D_gram_znorm_contrastive", "E_gram_znorm_contrastive_exmcr",
+        "F_full_cmsci",
+    ]
+    results = {}
+    for vk in variant_keys:
+        human_vals = []
+        variant_vals = []
+        for sample_id, agg in aggregated.items():
+            if sample_id not in cmsci_scores:
+                continue
+            vs = cmsci_scores[sample_id].get("variant_scores", {})
+            val = vs.get(vk)
+            if val is not None:
+                human_vals.append(agg["weighted_score"]["mean"])
+                variant_vals.append(val)
+
+        if len(human_vals) < 5:
+            results[vk] = {"n_paired": len(human_vals), "error": "Too few samples"}
+            continue
+
+        rho, p = stats.spearmanr(np.array(variant_vals), np.array(human_vals))
+        results[vk] = {
+            "n_paired": len(human_vals),
+            "spearman_rho": round(float(rho), 4),
+            "spearman_p": float(p),
+        }
+    return results
 
 
 def analyze_by_condition_multi(sessions, sample_msci, sample_conditions):
@@ -196,7 +316,61 @@ def main():
     else:
         print(f"  {correlation['error']}")
 
-    # --- 4. Per-condition breakdown ---
+    # --- 4. cMSCI vs Human correlation ---
+    print("\n--- cMSCI vs Human Score Correlation ---")
+    with open(SAMPLES_PATH) as f:
+        samples_list = json.load(f)["samples"]
+    print(f"  Computing cMSCI (Variant D) for {len(samples_list)} samples...")
+    cmsci_scores = compute_cmsci_scores(samples_list)
+    print(f"  Scored {len(cmsci_scores)}/{len(samples_list)} samples")
+
+    # Active variant distribution
+    active_variants = [v.get("active_variant", "?") for v in cmsci_scores.values()]
+    from collections import Counter
+    vc = Counter(active_variants)
+    print(f"  Active variants: {dict(vc)}")
+
+    cmsci_correlation = compute_cmsci_human_correlation(sessions, cmsci_scores)
+    if "error" not in cmsci_correlation:
+        print(f"  N paired:      {cmsci_correlation['n_paired']}")
+        print(f"  Spearman rho:  {cmsci_correlation['spearman_rho']:.4f}")
+        print(f"  Spearman p:    {cmsci_correlation['spearman_p']:.6f}")
+        print(f"  95% CI:        [{cmsci_correlation['spearman_95ci'][0]:.4f}, "
+              f"{cmsci_correlation['spearman_95ci'][1]:.4f}]")
+        print(f"  Pearson r:     {cmsci_correlation['pearson_r']:.4f}")
+        print(f"  Pearson p:     {cmsci_correlation['pearson_p']:.6f}")
+    else:
+        print(f"  {cmsci_correlation['error']}")
+
+    # Side-by-side comparison
+    print("\n--- MSCI vs cMSCI — Side-by-Side Human Correlation ---")
+    msci_rho = correlation.get("spearman_rho", "N/A")
+    msci_p = correlation.get("spearman_p", "N/A")
+    msci_ci = correlation.get("spearman_95ci", ["N/A", "N/A"])
+    cmsci_rho = cmsci_correlation.get("spearman_rho", "N/A")
+    cmsci_p = cmsci_correlation.get("spearman_p", "N/A")
+    cmsci_ci = cmsci_correlation.get("spearman_95ci", ["N/A", "N/A"])
+    print(f"  {'Metric':10s} {'rho':>8s} {'p-value':>12s} {'95% CI':>20s}")
+    print(f"  {'-'*10} {'-'*8} {'-'*12} {'-'*20}")
+    if isinstance(msci_rho, float):
+        print(f"  {'MSCI':10s} {msci_rho:8.4f} {msci_p:12.6f} [{msci_ci[0]:.4f}, {msci_ci[1]:.4f}]")
+    if isinstance(cmsci_rho, float):
+        print(f"  {'cMSCI':10s} {cmsci_rho:8.4f} {cmsci_p:12.6f} [{cmsci_ci[0]:.4f}, {cmsci_ci[1]:.4f}]")
+
+    # Per-variant correlation
+    print("\n--- Per-Variant Human Correlation ---")
+    variant_corrs = compute_variant_correlations(sessions, cmsci_scores)
+    print(f"  {'Variant':35s} {'N':>3s} {'rho':>8s} {'p':>10s}")
+    print(f"  {'-'*35} {'-'*3} {'-'*8} {'-'*10}")
+    for vk, vc_data in variant_corrs.items():
+        if "error" in vc_data:
+            print(f"  {vk:35s} {vc_data['n_paired']:3d}   (insufficient data)")
+        else:
+            sig = "*" if vc_data["spearman_p"] < 0.05 else ""
+            print(f"  {vk:35s} {vc_data['n_paired']:3d} {vc_data['spearman_rho']:8.4f} "
+                  f"{vc_data['spearman_p']:10.6f}{sig}")
+
+    # --- 5. Per-condition breakdown ---
     print("\n--- Per-Condition Analysis ---")
     by_condition = analyze_by_condition_multi(sessions, sample_msci, sample_conditions)
     print(f"  {'Condition':15s} {'N':>3s} {'Human':>8s} {'MSCI':>8s}")
@@ -205,10 +379,12 @@ def main():
         print(f"  {cond:15s} {data['n']:3d} {data['human_weighted_mean']:8.4f} "
               f"{data['msci_mean']:8.4f}")
 
-    # --- 5. Verdict ---
-    verdict = determine_verdict(correlation)
+    # --- 6. Verdict ---
+    verdict_msci = determine_verdict(correlation)
+    verdict_cmsci = determine_verdict(cmsci_correlation) if "error" not in cmsci_correlation else "INCONCLUSIVE"
     print(f"\n{'='*60}")
-    print(f"RQ3 VERDICT: {verdict}")
+    print(f"RQ3 VERDICT (MSCI):  {verdict_msci}")
+    print(f"RQ3 VERDICT (cMSCI): {verdict_cmsci}")
     print(f"{'='*60}")
 
     # --- Save full report ---
@@ -220,13 +396,30 @@ def main():
         "inter_rater_reliability": irr,
         "intra_rater_reliability": intra_results,
         "msci_correlation": correlation,
+        "cmsci_correlation": cmsci_correlation,
+        "variant_correlations": variant_corrs,
         "by_condition": by_condition,
-        "verdict": verdict,
+        "verdict_msci": verdict_msci,
+        "verdict_cmsci": verdict_cmsci,
+        "verdict": verdict_msci,
     }
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    class NumpyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, (np.integer,)):
+                return int(obj)
+            if isinstance(obj, (np.floating,)):
+                return float(obj)
+            if isinstance(obj, (np.bool_,)):
+                return bool(obj)
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return super().default(obj)
+
     with open(OUTPUT_PATH, "w") as f:
-        json.dump(report, f, indent=2)
+        json.dump(report, f, indent=2, cls=NumpyEncoder)
 
     print(f"\nFull report saved to: {OUTPUT_PATH}")
 

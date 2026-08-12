@@ -862,6 +862,345 @@ else:
     print("\n[Fig 13] Skipped — no generative results found at runs/rq1_gen/rq1_gen_results.json")
 
 
+# ═══════════════════════════════════════════════════════════
+# FIGURE 14: cMSCI Ablation — Bar Chart of Effect Sizes by Variant
+# ═══════════════════════════════════════════════════════════
+cmsci_ablation_path = ROOT / "runs/cmsci_ablation/cmsci_ablation.json"
+if cmsci_ablation_path.exists():
+    print("[Fig 14] cMSCI ablation bar chart...")
+
+    with open(cmsci_ablation_path) as f:
+        ablation_data = json.load(f)["ablation"]
+
+    variant_keys = ["A_msci", "B_gram", "C_gram_znorm", "D_gram_znorm_contrastive",
+                    "E_gram_znorm_contrastive_exmcr", "F_full_cmsci"]
+    variant_labels = ["A: MSCI", "B: GRAM", "C: +z-norm", "D: +contrastive",
+                      "E: +Ex-MCR", "F: +ProbVLM"]
+    colors_ab = ["#95a5a6", "#2ecc71", "#27ae60", "#16a085", "#2980b9", "#8e44ad"]
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    for ax_idx, (pert, pert_label) in enumerate([
+        ("wrong_image", "vs Wrong Image"),
+        ("wrong_audio", "vs Wrong Audio"),
+    ]):
+        ax = axes[ax_idx]
+        d_vals = []
+        ci_lows = []
+        ci_highs = []
+
+        for vk in variant_keys:
+            entry = ablation_data.get(vk, {})
+            es = entry.get(f"effect_size_{pert}", {})
+            d = es.get("d")
+            ci_lo = es.get("ci_lower", 0)
+            ci_hi = es.get("ci_upper", 0)
+            d_vals.append(d if d is not None else 0)
+            ci_lows.append(d - ci_lo if d is not None else 0)
+            ci_highs.append(ci_hi - d if d is not None else 0)
+
+        x = np.arange(len(variant_keys))
+        bars = ax.bar(x, d_vals, color=colors_ab, edgecolor="black", linewidth=0.5, alpha=0.85)
+        ax.errorbar(x, d_vals, yerr=[ci_lows, ci_highs], fmt="none",
+                    ecolor="black", capsize=3, linewidth=1.0)
+
+        # Value labels
+        for i, d in enumerate(d_vals):
+            ax.text(i, d + ci_highs[i] + 0.1, f"{d:.2f}", ha="center", va="bottom", fontsize=8)
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(variant_labels, rotation=30, ha="right", fontsize=9)
+        ax.set_ylabel("Cohen's d [95% CI]")
+        ax.set_title(f"Perturbation Sensitivity ({pert_label})")
+        ax.axhline(0.8, color="#bdc3c7", linewidth=0.5, linestyle=":", zorder=0)
+        ax.text(len(x) - 0.5, 0.85, "large", fontsize=7, color="#999")
+
+    fig.suptitle("cMSCI Ablation: Effect Sizes by Variant Layer", fontsize=13, y=1.02)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "fig14_cmsci_ablation_f.pdf")
+    fig.savefig(FIG_DIR / "fig14_cmsci_ablation_f.png")
+    plt.close(fig)
+    print(f"  → Saved: fig14_cmsci_ablation_f.pdf/png")
+else:
+    print("\n[Fig 14] Skipped — no ablation results at runs/cmsci_ablation/cmsci_ablation.json")
+
+
+# ═══════════════════════════════════════════════════════════
+# FIGURE 15: cMSCI vs MSCI Score Distributions
+# ═══════════════════════════════════════════════════════════
+cmsci_comp_path = ROOT / "runs/cmsci_comparison/cmsci_comparison.json"
+if cmsci_comp_path.exists():
+    print("[Fig 15] cMSCI vs MSCI distributions...")
+
+    with open(cmsci_comp_path) as f:
+        cmsci_data = json.load(f)["results"]
+
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4.5))
+
+    for ax_idx, condition in enumerate(["baseline", "wrong_image", "wrong_audio"]):
+        ax = axes[ax_idx]
+        msci_vals = [r["msci"] for r in cmsci_data if r.get("condition") == condition and r.get("msci") is not None]
+        cmsci_vals = [r["cmsci"] for r in cmsci_data if r.get("condition") == condition and r.get("cmsci") is not None]
+
+        if msci_vals:
+            ax.hist(msci_vals, bins=20, alpha=0.6, color="#e74c3c", label="MSCI", edgecolor="white", linewidth=0.3)
+        if cmsci_vals:
+            ax.hist(cmsci_vals, bins=20, alpha=0.6, color="#3498db", label="cMSCI", edgecolor="white", linewidth=0.3)
+
+        cond_label = condition.replace("_", " ").title()
+        ax.set_title(cond_label)
+        ax.set_xlabel("Score")
+        if ax_idx == 0:
+            ax.set_ylabel("Count")
+        ax.legend(fontsize=9)
+
+        # Annotate means
+        if msci_vals:
+            ax.axvline(np.mean(msci_vals), color="#e74c3c", linestyle="--", linewidth=1.0, alpha=0.7)
+        if cmsci_vals:
+            ax.axvline(np.mean(cmsci_vals), color="#3498db", linestyle="--", linewidth=1.0, alpha=0.7)
+
+    fig.suptitle("Score Distributions: MSCI vs cMSCI by Condition", fontsize=13, y=1.02)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "fig15_cmsci_distributions_f.pdf")
+    fig.savefig(FIG_DIR / "fig15_cmsci_distributions_f.png")
+    plt.close(fig)
+    print(f"  → Saved: fig15_cmsci_distributions_f.pdf/png")
+
+
+    # ═══════════════════════════════════════════════════════════
+    # FIGURE 16: cMSCI Uncertainty (if available)
+    # ═══════════════════════════════════════════════════════════
+    has_uncertainty = any(
+        r.get("cmsci_result", {}).get("uncertainty") is not None
+        for r in cmsci_data if isinstance(r.get("cmsci_result"), dict)
+    )
+
+    if has_uncertainty:
+        print("[Fig 16] cMSCI uncertainty intervals...")
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        baseline_items = [
+            r for r in cmsci_data
+            if r.get("condition") == "baseline"
+            and isinstance(r.get("cmsci_result"), dict)
+            and r["cmsci_result"].get("uncertainty") is not None
+        ]
+
+        baseline_items.sort(key=lambda r: r["cmsci_result"]["uncertainty"]["mc_mean"])
+
+        for i, r in enumerate(baseline_items):
+            unc = r["cmsci_result"]["uncertainty"]
+            mean_val = unc["mc_mean"]
+            ci_lo = unc["mc_ci_lower"]
+            ci_hi = unc["mc_ci_upper"]
+            ax.errorbar(i, mean_val, yerr=[[mean_val - ci_lo], [ci_hi - mean_val]],
+                        fmt="o", markersize=4, color="#3498db", capsize=2, linewidth=0.8, alpha=0.7)
+
+        ax.set_xlabel("Sample (sorted by cMSCI)")
+        ax.set_ylabel("cMSCI [95% CI]")
+        ax.set_title("cMSCI with Probabilistic Uncertainty Intervals (Baseline)")
+
+        fig.tight_layout()
+        fig.savefig(FIG_DIR / "fig16_cmsci_uncertainty_f.pdf")
+        fig.savefig(FIG_DIR / "fig16_cmsci_uncertainty_f.png")
+        plt.close(fig)
+        print(f"  → Saved: fig16_cmsci_uncertainty_f.pdf/png")
+    else:
+        print("[Fig 16] Skipped — no uncertainty data in comparison results")
+
+else:
+    print("\n[Fig 15-16] Skipped — no cMSCI comparison results")
+
+
+# ═══════════════════════════════════════════════════════════════════
+# NEW FIGURES (Professor Feedback Response)
+# ═══════════════════════════════════════════════════════════════════
+
+# FIGURE 17: Baseline Comparison Bar Chart
+full_eval_path = ROOT / "runs" / "full_evaluation" / "full_evaluation.json"
+if full_eval_path.exists():
+    print("\n[Fig 17] Baseline comparison bar chart...")
+    with open(full_eval_path) as f:
+        eval_data = json.load(f)
+
+    methods = []
+    rhos = []
+    significant = []
+    for method, corr in sorted(eval_data["results"].items(), key=lambda x: x[1].get("rho", -999), reverse=True):
+        if corr.get("rho") is not None:
+            methods.append(method)
+            rhos.append(corr["rho"])
+            significant.append(corr.get("p", 1.0) < 0.05)
+
+    if methods:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        colors = ["#e74c3c" if m == "cMSCI" else "#3498db" if m == "MSCI" else "#95a5a6" for m in methods]
+        # Highlight significant with full opacity, non-significant with reduced
+        alphas = [1.0 if sig else 0.5 for sig in significant]
+
+        bars = ax.barh(range(len(methods)), rhos, color=colors, edgecolor="white", linewidth=0.5)
+        for bar, alpha in zip(bars, alphas):
+            bar.set_alpha(alpha)
+
+        # Add significance markers
+        for i, (rho, sig) in enumerate(zip(rhos, significant)):
+            marker = " *" if sig else ""
+            ax.text(rho + 0.01, i, f"{rho:.3f}{marker}", va="center", fontsize=9)
+
+        ax.set_yticks(range(len(methods)))
+        ax.set_yticklabels(methods, fontsize=10)
+        ax.set_xlabel("Spearman ρ with Human Ratings", fontsize=11)
+        ax.set_title("Baseline Comparison: Correlation with Human Coherence Ratings", fontsize=12, fontweight="bold")
+        ax.axvline(0, color="black", linewidth=0.5)
+        ax.set_xlim(-0.2, max(rhos) + 0.1)
+        ax.invert_yaxis()
+
+        # Legend
+        from matplotlib.patches import Patch
+        legend_elements = [
+            Patch(facecolor="#e74c3c", label="cMSCI (ours)"),
+            Patch(facecolor="#3498db", label="MSCI (legacy)"),
+            Patch(facecolor="#95a5a6", label="External baselines"),
+        ]
+        ax.legend(handles=legend_elements, loc="lower right", fontsize=9)
+
+        fig.tight_layout()
+        fig.savefig(FIG_DIR / "fig17_baseline_comparison_f.pdf")
+        fig.savefig(FIG_DIR / "fig17_baseline_comparison_f.png")
+        plt.close(fig)
+        print(f"  → Saved: fig17_baseline_comparison_f.pdf/png")
+else:
+    print("\n[Fig 17] Skipped — no full evaluation results")
+
+# FIGURE 18: Sensitivity Curves
+sensitivity_path = ROOT / "runs" / "sensitivity" / "sensitivity_analysis.json"
+if sensitivity_path.exists():
+    print("\n[Fig 18] Sensitivity curves...")
+    with open(sensitivity_path) as f:
+        sens_data = json.load(f)
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    fig.suptitle("Hyperparameter Sensitivity Analysis", fontsize=14, fontweight="bold")
+
+    param_labels = {
+        "alpha": ("Margin Scaling (α)", "α"),
+        "w_ti": ("Text-Image Weight (w_ti)", "w_ti"),
+        "w_3d": ("Complementarity Weight (w_3d)", "w_3d"),
+        "gamma": ("Adaptive Mixing (γ)", "γ"),
+    }
+
+    optimal = sens_data.get("optimal_config", {})
+
+    for idx, (param, (title, xlabel)) in enumerate(param_labels.items()):
+        ax = axes[idx // 2][idx % 2]
+        sweep = sens_data["sweeps"].get(param, [])
+        if not sweep:
+            continue
+
+        vals = [s["value"] for s in sweep]
+        rhos = [s["rho"] for s in sweep]
+        sigs = [s.get("significant", False) for s in sweep]
+
+        ax.plot(vals, rhos, "o-", color="#2c3e50", linewidth=2, markersize=6)
+
+        # Mark significant points
+        sig_vals = [v for v, s in zip(vals, sigs) if s]
+        sig_rhos = [r for r, s in zip(rhos, sigs) if s]
+        ax.scatter(sig_vals, sig_rhos, color="#e74c3c", s=80, zorder=5, label="p < 0.05")
+
+        # Mark optimal
+        opt_val = optimal.get(param)
+        if opt_val is not None:
+            ax.axvline(opt_val, color="#e74c3c", linestyle="--", alpha=0.5, label=f"Optimal: {opt_val}")
+
+        ax.set_xlabel(xlabel, fontsize=11)
+        ax.set_ylabel("Spearman ρ", fontsize=11)
+        ax.set_title(title, fontsize=12)
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "fig18_sensitivity_curves_f.pdf")
+    fig.savefig(FIG_DIR / "fig18_sensitivity_curves_f.png")
+    plt.close(fig)
+    print(f"  → Saved: fig18_sensitivity_curves_f.pdf/png")
+else:
+    print("\n[Fig 18] Skipped — no sensitivity analysis results")
+
+# FIGURE 19: Seed Robustness Box Plot
+seed_path = ROOT / "runs" / "robustness" / "seed_robustness.json"
+if seed_path.exists():
+    print("\n[Fig 19] Seed robustness box plot...")
+    with open(seed_path) as f:
+        seed_data = json.load(f)
+
+    rhos = [r["rho"] for r in seed_data["per_seed"]]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    bp = ax.boxplot(rhos, widths=0.4, patch_artist=True,
+                    boxprops=dict(facecolor="#3498db", alpha=0.7),
+                    medianprops=dict(color="#e74c3c", linewidth=2))
+
+    # Individual points
+    jitter = np.random.default_rng(42).normal(0, 0.02, len(rhos))
+    ax.scatter(np.ones(len(rhos)) + jitter, rhos, color="#2c3e50", alpha=0.6, s=40, zorder=3)
+
+    summary = seed_data.get("summary", {})
+    ax.set_ylabel("Spearman ρ", fontsize=12)
+    ax.set_title(
+        f"Seed Robustness (n={len(rhos)} seeds)\n"
+        f"Mean ρ = {summary.get('mean_rho', np.mean(rhos)):.4f} ± {summary.get('std_rho', np.std(rhos)):.4f}",
+        fontsize=12, fontweight="bold",
+    )
+    ax.set_xticklabels(["cMSCI\n(Variant F)"], fontsize=11)
+    ax.grid(True, axis="y", alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / "fig19_seed_robustness_f.pdf")
+    fig.savefig(FIG_DIR / "fig19_seed_robustness_f.png")
+    plt.close(fig)
+    print(f"  → Saved: fig19_seed_robustness_f.pdf/png")
+else:
+    print("\n[Fig 19] Skipped — no seed robustness results")
+
+# FIGURE 20: Failure Case Summary
+failure_path = ROOT / "runs" / "failure_analysis" / "failure_analysis.json"
+if failure_path.exists():
+    print("\n[Fig 20] Failure case summary...")
+    with open(failure_path) as f:
+        failure_data = json.load(f)
+
+    modes = failure_data.get("failure_modes_summary", {})
+    if modes:
+        # Sort by count
+        sorted_modes = sorted(modes.items(), key=lambda x: x[1], reverse=True)
+        labels = [m[0].replace("_", " ").title() for m in sorted_modes[:8]]
+        counts = [m[1] for m in sorted_modes[:8]]
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        bars = ax.barh(range(len(labels)), counts, color="#e67e22", edgecolor="white")
+        ax.set_yticks(range(len(labels)))
+        ax.set_yticklabels(labels, fontsize=10)
+        ax.set_xlabel("Number of Samples", fontsize=11)
+        ax.set_title("Failure Mode Distribution", fontsize=12, fontweight="bold")
+        ax.invert_yaxis()
+
+        for bar, count in zip(bars, counts):
+            ax.text(bar.get_width() + 0.2, bar.get_y() + bar.get_height()/2,
+                    str(count), va="center", fontsize=9)
+
+        fig.tight_layout()
+        fig.savefig(FIG_DIR / "fig20_failure_modes_f.pdf")
+        fig.savefig(FIG_DIR / "fig20_failure_modes_f.png")
+        plt.close(fig)
+        print(f"  → Saved: fig20_failure_modes_f.pdf/png")
+else:
+    print("\n[Fig 20] Skipped — no failure analysis results")
+
+
 print("\n" + "=" * 60)
 print("ALL FIGURES GENERATED SUCCESSFULLY")
 print("=" * 60)

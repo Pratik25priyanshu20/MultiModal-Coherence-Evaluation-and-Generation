@@ -1,0 +1,7 @@
+{
+  "clip_image_dim": 512,
+  "clap_audio_dim": 512,
+  "bridge_dim": 256,
+  "hidden_dim": 384,
+  "dropout": 0.1
+}

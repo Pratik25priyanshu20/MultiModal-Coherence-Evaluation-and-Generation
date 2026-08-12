@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cmsci"
+version = "0.1.0"
+description = "cMSCI — Calibrated Multimodal Semantic Coherence Index for text/image/audio triples"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Pratik Priyanshu" }]
+keywords = [
+    "multimodal",
+    "coherence",
+    "evaluation-metric",
+    "CLIP",
+    "CLAP",
+    "embeddings",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.10",
+    "torch>=2.0",
+    "transformers>=4.30,<5.0",
+    "pillow>=10.0",
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "joblib>=1.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.urls]
+Repository = "https://github.com/Pratik25priyanshu20/MultiModal-Coherence-Evaluation-and-Generation"
+Issues = "https://github.com/Pratik25priyanshu20/MultiModal-Coherence-Evaluation-and-Generation/issues"
+
+[project.scripts]
+cmsci = "cmsci.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cmsci*"]
+
+[tool.setuptools.package-data]
+cmsci = [
+    "assets/artifacts/*.json",
+    "assets/models/**/*.pt",
+    "assets/models/**/*.json",
+    "assets/data/embeddings/*.npz",
+]

@@ -1,0 +1,44 @@
+{
+  "gram_coh_ti_gemini": {
+    "name": "gram_coh_ti_gemini",
+    "mean": 0.0458587298235209,
+    "std": 0.019743493221289134,
+    "n": 90
+  },
+  "gram_coh_ta_gemini": {
+    "name": "gram_coh_ta_gemini",
+    "mean": 0.09943226074672135,
+    "std": 0.0691112665851998,
+    "n": 90
+  },
+  "gram_coh_ia_gemini": {
+    "name": "gram_coh_ia_gemini",
+    "mean": 0.06557896416235907,
+    "std": 0.010742031497352702,
+    "n": 90
+  },
+  "gram_coh_tia_gemini": {
+    "name": "gram_coh_tia_gemini",
+    "mean": 0.17415386065122318,
+    "std": 0.0613586178494626,
+    "n": 90
+  },
+  "cos_ti_gemini": {
+    "name": "cos_ti_gemini",
+    "mean": 0.2920985909745634,
+    "std": 0.0628591953366069,
+    "n": 90
+  },
+  "cos_ta_gemini": {
+    "name": "cos_ta_gemini",
+    "mean": 0.4043514530133304,
+    "std": 0.14487079766996316,
+    "n": 90
+  },
+  "cos_ia_gemini": {
+    "name": "cos_ia_gemini",
+    "mean": 0.35493118519697975,
+    "std": 0.027851233984834613,
+    "n": 90
+  }
+}

@@ -1,0 +1,505 @@
+{
+  "dataset": "OpenSound_AudioCaps_test_hf",
+  "entries": [
+    {
+      "audiocap_id": "103549",
+      "caption": "Constant rattling noise and sharp vibrations",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103549.wav"
+    },
+    {
+      "audiocap_id": "103548",
+      "caption": "A rocket flies by followed by a loud explosion and fire crackling as a truck engine runs idle",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103548.wav"
+    },
+    {
+      "audiocap_id": "103541",
+      "caption": "Humming and vibrating with a man and children speaking and laughing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103541.wav"
+    },
+    {
+      "audiocap_id": "103540",
+      "caption": "A train running on a railroad track followed by a vehicle door closing and a man talking in the distance while a train horn honks and railroad crossing warning signals ring",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103540.wav"
+    },
+    {
+      "audiocap_id": "103542",
+      "caption": "Food is frying, and a woman talks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103542.wav"
+    },
+    {
+      "audiocap_id": "103545",
+      "caption": "A man speaks as birds chirp and dogs bark",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103545.wav"
+    },
+    {
+      "audiocap_id": "103544",
+      "caption": "A large truck driving by as an emergency siren wails and truck horn honks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103544.wav"
+    },
+    {
+      "audiocap_id": "103547",
+      "caption": "A child yelling as a young boy talks during several slaps on a hard surface",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103547.wav"
+    },
+    {
+      "audiocap_id": "103546",
+      "caption": "An engine rumbles loudly, then an air horn honk three times",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103546.wav"
+    },
+    {
+      "audiocap_id": "102819",
+      "caption": "A person snoring with another man speaking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102819.wav"
+    },
+    {
+      "audiocap_id": "103938",
+      "caption": "Thunder and a gentle rain",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103938.wav"
+    },
+    {
+      "audiocap_id": "103939",
+      "caption": "A woman talks and a baby whispers",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103939.wav"
+    },
+    {
+      "audiocap_id": "103543",
+      "caption": "A man talking as a stream of water trickles in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103543.wav"
+    },
+    {
+      "audiocap_id": "104278",
+      "caption": "A person briefly talks followed quickly by toilet flushing and another voice from another person",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104278.wav"
+    },
+    {
+      "audiocap_id": "104279",
+      "caption": "A woman singing then choking followed by birds chirping",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104279.wav"
+    },
+    {
+      "audiocap_id": "104276",
+      "caption": "Machinery banging and hissing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104276.wav"
+    },
+    {
+      "audiocap_id": "104277",
+      "caption": "A person talking which later imitates a couple of meow sounds",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104277.wav"
+    },
+    {
+      "audiocap_id": "104274",
+      "caption": "Rain is falling continuously",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104274.wav"
+    },
+    {
+      "audiocap_id": "104275",
+      "caption": "An infant crying followed by a man laughing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104275.wav"
+    },
+    {
+      "audiocap_id": "104272",
+      "caption": "A man talking as a door slams shut followed by a door creaking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104272.wav"
+    },
+    {
+      "audiocap_id": "104270",
+      "caption": "Whistling with wind blowing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104270.wav"
+    },
+    {
+      "audiocap_id": "104271",
+      "caption": "Vehicles passing by slowly together with distant murmuring",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104271.wav"
+    },
+    {
+      "audiocap_id": "105639",
+      "caption": "Water is trickling, and a man talks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105639.wav"
+    },
+    {
+      "audiocap_id": "105638",
+      "caption": "Scraping and speech followed by people laughing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105638.wav"
+    },
+    {
+      "audiocap_id": "105630",
+      "caption": "Birds are squawking, and ducks are quacking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105630.wav"
+    },
+    {
+      "audiocap_id": "105633",
+      "caption": "Repeated gunfire and screaming in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105633.wav"
+    },
+    {
+      "audiocap_id": "105632",
+      "caption": "An aircraft engine is taking off",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105632.wav"
+    },
+    {
+      "audiocap_id": "105635",
+      "caption": "Water running with a main is speaking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105635.wav"
+    },
+    {
+      "audiocap_id": "105634",
+      "caption": "A female speaking with some rustling followed by another female speaking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105634.wav"
+    },
+    {
+      "audiocap_id": "105637",
+      "caption": "Males speaking and then a clock ticks twice",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105637.wav"
+    },
+    {
+      "audiocap_id": "105636",
+      "caption": "An engine revving and then tires squealing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105636.wav"
+    },
+    {
+      "audiocap_id": "102942",
+      "caption": "A woman speaking followed by a porcelain plate clanking as food and oil sizzles",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102942.wav"
+    },
+    {
+      "audiocap_id": "102943",
+      "caption": "An engine hums as it idles",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102943.wav"
+    },
+    {
+      "audiocap_id": "102940",
+      "caption": "Blowing of a horn as a train passes",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102940.wav"
+    },
+    {
+      "audiocap_id": "102941",
+      "caption": "Short spray followed by louder longer spray",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102941.wav"
+    },
+    {
+      "audiocap_id": "102946",
+      "caption": "A motor is revving and changing gears",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102946.wav"
+    },
+    {
+      "audiocap_id": "102947",
+      "caption": "Humming from an engine slowing down then speeding up",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102947.wav"
+    },
+    {
+      "audiocap_id": "102944",
+      "caption": "A baby cries as a woman speaks with other speech background noise",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102944.wav"
+    },
+    {
+      "audiocap_id": "102945",
+      "caption": "Ocean waves crashing in the distance as young girl talks followed by a young man talking while a group of children laughs in the background and wind blows into a microphone",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102945.wav"
+    },
+    {
+      "audiocap_id": "102948",
+      "caption": "An adult female speaks, and muted speech occurs briefly in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102948.wav"
+    },
+    {
+      "audiocap_id": "103707",
+      "caption": "A metal clank followed by motor vibrating and rumbling",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103707.wav"
+    },
+    {
+      "audiocap_id": "103706",
+      "caption": "Music and a man speaking followed by bleeps and someone singing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103706.wav"
+    },
+    {
+      "audiocap_id": "103705",
+      "caption": "Motorboat engine screams as it accelerates",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103705.wav"
+    },
+    {
+      "audiocap_id": "103704",
+      "caption": "A man speaking followed by another man speaking with some rustling",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103704.wav"
+    },
+    {
+      "audiocap_id": "103703",
+      "caption": "A vehicle horn honking followed by a large truck engine accelerating while wind blows lightly into a microphone",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103703.wav"
+    },
+    {
+      "audiocap_id": "103702",
+      "caption": "Many insects are buzzing and rustling is occurring, while an adult male speaks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103702.wav"
+    },
+    {
+      "audiocap_id": "103701",
+      "caption": "People speaking with loud bangs followed by a slow motion rumble",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103701.wav"
+    },
+    {
+      "audiocap_id": "107162",
+      "caption": "A couple of men speaking as metal clanks and a power tool operates",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107162.wav"
+    },
+    {
+      "audiocap_id": "103709",
+      "caption": "A man speaks and then whistles",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103709.wav"
+    },
+    {
+      "audiocap_id": "107284",
+      "caption": "Bells ring followed by humming and vibrations as a train passes while blowing a horn",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107284.wav"
+    },
+    {
+      "audiocap_id": "107285",
+      "caption": "A vehicle engine revving as a crowd of people talk",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107285.wav"
+    },
+    {
+      "audiocap_id": "107283",
+      "caption": "Several ducks quack and chirp as men speak and wind blows",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107283.wav"
+    },
+    {
+      "audiocap_id": "107280",
+      "caption": "A woman talking as a baby talks followed by plastic thumping",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107280.wav"
+    },
+    {
+      "audiocap_id": "107288",
+      "caption": "A sewing machine operating as a machine motor hisses loudly in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107288.wav"
+    },
+    {
+      "audiocap_id": "107289",
+      "caption": "Digital beeps repeating then a person speaks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107289.wav"
+    },
+    {
+      "audiocap_id": "105082",
+      "caption": "A man and woman laughing followed by a man shouting then a woman laughing as a child laughs",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105082.wav"
+    },
+    {
+      "audiocap_id": "81991",
+      "caption": "Crumpling paper noise with female speech",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_81991.wav"
+    },
+    {
+      "audiocap_id": "19586",
+      "caption": "A bell is ringing loudly and quickly",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_19586.wav"
+    },
+    {
+      "audiocap_id": "103478",
+      "caption": "Several birds chirp with some hissing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103478.wav"
+    },
+    {
+      "audiocap_id": "103475",
+      "caption": "A man speaking as a crowd of people laugh and applaud",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103475.wav"
+    },
+    {
+      "audiocap_id": "103474",
+      "caption": "A small motor buzzing followed by a man speaking as a metal door closes",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103474.wav"
+    },
+    {
+      "audiocap_id": "103477",
+      "caption": "Clip-clops gallop as the wind blows and thunder cracks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103477.wav"
+    },
+    {
+      "audiocap_id": "106483",
+      "caption": "Electronic beeping as a man talks and water pouring in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106483.wav"
+    },
+    {
+      "audiocap_id": "103470",
+      "caption": "Food and oil sizzling as a woman is talking followed by dinner plates clanking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103470.wav"
+    },
+    {
+      "audiocap_id": "103472",
+      "caption": "Wind blowing followed by people speaking then a loud burst of thunder",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_103472.wav"
+    },
+    {
+      "audiocap_id": "106621",
+      "caption": "A heavy rain dies down and begins again",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106621.wav"
+    },
+    {
+      "audiocap_id": "104751",
+      "caption": "A train sounds horn while traveling on train track",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104751.wav"
+    },
+    {
+      "audiocap_id": "104753",
+      "caption": "A man speaking over an intercom as a helicopter engine runs followed by several gunshots firing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104753.wav"
+    },
+    {
+      "audiocap_id": "104752",
+      "caption": "A man talking followed by a goat baaing then a metal gate sliding while ducks quack and wind blows into a microphone",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104752.wav"
+    },
+    {
+      "audiocap_id": "104757",
+      "caption": "Motorcycle engine running",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104757.wav"
+    },
+    {
+      "audiocap_id": "104756",
+      "caption": "A vehicle door opening as a crow caws and birds chirp while vehicles drive by in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_104756.wav"
+    },
+    {
+      "audiocap_id": "105402",
+      "caption": "An engine running and wind with various speech in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105402.wav"
+    },
+    {
+      "audiocap_id": "105403",
+      "caption": "A drone whirring followed by a crashing sound",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105403.wav"
+    },
+    {
+      "audiocap_id": "105400",
+      "caption": "A man talking as a helicopter flies by",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_105400.wav"
+    },
+    {
+      "audiocap_id": "106661",
+      "caption": "Screaming, wind and an engine running, and laughing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106661.wav"
+    },
+    {
+      "audiocap_id": "106667",
+      "caption": "A series of computer mouse clicks followed by a kid crying",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106667.wav"
+    },
+    {
+      "audiocap_id": "106666",
+      "caption": "A series of electronic beeps followed by static",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106666.wav"
+    },
+    {
+      "audiocap_id": "106665",
+      "caption": "Loud snoring repeating",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106665.wav"
+    },
+    {
+      "audiocap_id": "106664",
+      "caption": "Water pouring down a drain with a series of metal clangs followed by a metal chain rattling",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106664.wav"
+    },
+    {
+      "audiocap_id": "106669",
+      "caption": "A man talking as water splashes",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106669.wav"
+    },
+    {
+      "audiocap_id": "106668",
+      "caption": "Wind blowing and water splashing",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_106668.wav"
+    },
+    {
+      "audiocap_id": "102753",
+      "caption": "A group of people laughing followed by a man talking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102753.wav"
+    },
+    {
+      "audiocap_id": "102751",
+      "caption": "Girl speaks and crunches plastic wrapping",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102751.wav"
+    },
+    {
+      "audiocap_id": "102750",
+      "caption": "Pigeons cooing as air lightly hisses in the background followed by a camera muffling",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102750.wav"
+    },
+    {
+      "audiocap_id": "102757",
+      "caption": "A series of compressed air spraying as a motor hums in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102757.wav"
+    },
+    {
+      "audiocap_id": "102756",
+      "caption": "Low ticktock sounds followed by objects moving",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102756.wav"
+    },
+    {
+      "audiocap_id": "102755",
+      "caption": "Gunshots fire, an adult male speaks, footfalls and clicking occur as other adult males speak, gunshots fire again, an adult male speaks, and a dog growls",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102755.wav"
+    },
+    {
+      "audiocap_id": "102754",
+      "caption": "Footsteps shuffling on snow alongside a camera muffling while wind blows into a microphone",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102754.wav"
+    },
+    {
+      "audiocap_id": "102759",
+      "caption": "Duck quacking repeatedly",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102759.wav"
+    },
+    {
+      "audiocap_id": "102758",
+      "caption": "Tribal drums playing as footsteps shuffle on wet dirt as frogs and crickets chirp in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_102758.wav"
+    },
+    {
+      "audiocap_id": "107130",
+      "caption": "A rooster clucking followed by a dog whimpering then a man talking and a dog barking",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107130.wav"
+    },
+    {
+      "audiocap_id": "107131",
+      "caption": "A power tool drill operating continuously",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107131.wav"
+    },
+    {
+      "audiocap_id": "107132",
+      "caption": "A man speaking as birds are chirping",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107132.wav"
+    },
+    {
+      "audiocap_id": "107133",
+      "caption": "Pretend to scream and crying is occurring, and an adult male begins to speak",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107133.wav"
+    },
+    {
+      "audiocap_id": "107134",
+      "caption": "Metal scrapping against a wooden surface followed by sand scrapping then more metal scrapping against wood",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107134.wav"
+    },
+    {
+      "audiocap_id": "107135",
+      "caption": "A cat meows and a woman speaks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107135.wav"
+    },
+    {
+      "audiocap_id": "107136",
+      "caption": "Whistling as a man speaks",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107136.wav"
+    },
+    {
+      "audiocap_id": "107137",
+      "caption": "A mid-size motor vehicle engine is revving repeatedly, while people talk in the background",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107137.wav"
+    },
+    {
+      "audiocap_id": "107138",
+      "caption": "A man is speaking as paper is crumpling",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107138.wav"
+    },
+    {
+      "audiocap_id": "107139",
+      "caption": "A vehicle engine revving then powering down",
+      "audio_path": "/Users/futurediary/Desktop/vs-Stack/Projects/MultiModal-Coherence-AI/data/benchmarks/audiocaps/audio/ac_107139.wav"
+    }
+  ]
+}

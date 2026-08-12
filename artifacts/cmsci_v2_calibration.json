@@ -1,0 +1,140 @@
+{
+  "gram_coh_ti_gemini": {
+    "name": "gram_coh_ti_gemini",
+    "mean": 0.0458587298235209,
+    "std": 0.019743493221289134,
+    "n": 90
+  },
+  "gram_coh_ta_gemini": {
+    "name": "gram_coh_ta_gemini",
+    "mean": 0.09943226074672135,
+    "std": 0.0691112665851998,
+    "n": 90
+  },
+  "gram_coh_ia_gemini": {
+    "name": "gram_coh_ia_gemini",
+    "mean": 0.06557896416235907,
+    "std": 0.010742031497352702,
+    "n": 90
+  },
+  "gram_coh_tia_gemini": {
+    "name": "gram_coh_tia_gemini",
+    "mean": 0.17415386065122318,
+    "std": 0.0613586178494626,
+    "n": 90
+  },
+  "cos_ti_gemini": {
+    "name": "cos_ti_gemini",
+    "mean": 0.2920985909745634,
+    "std": 0.0628591953366069,
+    "n": 90
+  },
+  "cos_ta_gemini": {
+    "name": "cos_ta_gemini",
+    "mean": 0.4043514530133304,
+    "std": 0.14487079766996316,
+    "n": 90
+  },
+  "cos_ia_gemini": {
+    "name": "cos_ia_gemini",
+    "mean": 0.35493118519697975,
+    "std": 0.027851233984834613,
+    "n": 90
+  },
+  "gram_coh_ia_1536": {
+    "name": "gram_coh_ia_1536",
+    "mean": 0.0657850927079359,
+    "std": 0.010700228653836059,
+    "n": 90
+  },
+  "gram_coh_ia_3072": {
+    "name": "gram_coh_ia_3072",
+    "mean": 0.06557896416235905,
+    "std": 0.010742031497352693,
+    "n": 90
+  },
+  "gram_coh_ia_768": {
+    "name": "gram_coh_ia_768",
+    "mean": 0.07101260364547589,
+    "std": 0.010858604764341275,
+    "n": 90
+  },
+  "gram_coh_ia_fused": {
+    "name": "gram_coh_ia_fused",
+    "mean": 0.0674588868385903,
+    "std": 0.010722525295977075,
+    "n": 90
+  },
+  "gram_coh_ta_1536": {
+    "name": "gram_coh_ta_1536",
+    "mean": 0.10320880676018855,
+    "std": 0.07034902576562269,
+    "n": 90
+  },
+  "gram_coh_ta_3072": {
+    "name": "gram_coh_ta_3072",
+    "mean": 0.09943226074672133,
+    "std": 0.06911126658519977,
+    "n": 90
+  },
+  "gram_coh_ta_768": {
+    "name": "gram_coh_ta_768",
+    "mean": 0.1083264285793522,
+    "std": 0.07166403777763596,
+    "n": 90
+  },
+  "gram_coh_ta_fused": {
+    "name": "gram_coh_ta_fused",
+    "mean": 0.10365583202875403,
+    "std": 0.07035455955600117,
+    "n": 90
+  },
+  "gram_coh_ti_1536": {
+    "name": "gram_coh_ti_1536",
+    "mean": 0.04641672883815874,
+    "std": 0.02016580852685229,
+    "n": 90
+  },
+  "gram_coh_ti_3072": {
+    "name": "gram_coh_ti_3072",
+    "mean": 0.04585872982352088,
+    "std": 0.019743493221289127,
+    "n": 90
+  },
+  "gram_coh_ti_768": {
+    "name": "gram_coh_ti_768",
+    "mean": 0.05133217317043979,
+    "std": 0.02099220507389073,
+    "n": 90
+  },
+  "gram_coh_ti_fused": {
+    "name": "gram_coh_ti_fused",
+    "mean": 0.047869210610706474,
+    "std": 0.020282356762574526,
+    "n": 90
+  },
+  "gram_coh_tia_1536": {
+    "name": "gram_coh_tia_1536",
+    "mean": 0.17773392224626722,
+    "std": 0.06239932625296409,
+    "n": 90
+  },
+  "gram_coh_tia_3072": {
+    "name": "gram_coh_tia_3072",
+    "mean": 0.17415386065122315,
+    "std": 0.06135861784946258,
+    "n": 90
+  },
+  "gram_coh_tia_768": {
+    "name": "gram_coh_tia_768",
+    "mean": 0.1884476242734126,
+    "std": 0.06276986004561287,
+    "n": 90
+  },
+  "gram_coh_tia_fused": {
+    "name": "gram_coh_tia_fused",
+    "mean": 0.18011180239030103,
+    "std": 0.06215649870430702,
+    "n": 90
+  }
+}

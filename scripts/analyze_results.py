@@ -479,12 +479,16 @@ def analyze_one_file(filepath: str, alpha: float = 0.05) -> Dict[str, Any]:
     print(f"Experiment: {experiment}")
     print(f"Config: {json.dumps(data.get('config', {}), indent=2)}")
 
-    if "RQ1" in experiment or "condition" in results[0]:
+    if "cMSCI" in experiment or "cmsci" in experiment:
+        return analyze_cmsci(results, alpha=alpha)
+    elif "RQ1" in experiment or "condition" in results[0]:
         return analyze_rq1(results, alpha=alpha)
     elif "RQ2" in experiment or "mode" in results[0]:
         return analyze_rq2(results, alpha=alpha)
     else:
-        if any(r.get("condition") for r in results):
+        if any(r.get("cmsci_result") for r in results):
+            return analyze_cmsci(results, alpha=alpha)
+        elif any(r.get("condition") for r in results):
             return analyze_rq1(results, alpha=alpha)
         else:
             return analyze_rq2(results, alpha=alpha)
@@ -497,7 +501,88 @@ ALL_RESULT_FILES = [
     "runs/rq1_hybrid/rq1_hybrid_results.json",
     "runs/rq2/rq2_results.json",
     "runs/rq2_hybrid/rq2_hybrid_results.json",
+    "runs/cmsci_comparison/cmsci_comparison.json",
 ]
+
+
+def analyze_cmsci(results: List[Dict[str, Any]], alpha: float = 0.05) -> Dict[str, Any]:
+    """
+    Analyze cMSCI comparison results: MSCI vs cMSCI side-by-side.
+
+    Computes effect sizes and correlation for both metrics.
+    """
+    print("\n" + "=" * 90)
+    print("cMSCI ANALYSIS: CALIBRATED vs LEGACY METRIC COMPARISON")
+    print("=" * 90)
+
+    # Filter to results with both scores
+    valid = [r for r in results if r.get("msci") is not None and r.get("cmsci") is not None]
+    print(f"\n  Results with both MSCI and cMSCI: {len(valid)}")
+
+    if len(valid) < 3:
+        print("  ERROR: Not enough results for analysis")
+        return {"error": "insufficient data"}
+
+    # Descriptive stats per metric per condition
+    for metric in ["msci", "cmsci"]:
+        print(f"\n  DESCRIPTIVE STATISTICS ({metric.upper()})")
+        print(f"  {'Condition':<16} {'N':>4} {'Mean':>8} {'Std':>8} {'Median':>8}")
+        print(f"  {'-'*16} {'-'*4} {'-'*8} {'-'*8} {'-'*8}")
+
+        for cond in ["baseline", "wrong_image", "wrong_audio"]:
+            scores = [r[metric] for r in valid if r.get("condition") == cond]
+            if scores:
+                print(
+                    f"  {cond:<16} {len(scores):>4} {np.mean(scores):>8.4f} "
+                    f"{np.std(scores):>8.4f} {np.median(scores):>8.4f}"
+                )
+
+    # Effect sizes for both metrics
+    print(f"\n  EFFECT SIZES (paired Cohen's d, baseline vs perturbation)")
+    print(f"  {'Metric':<10} {'Comparison':<30} {'d':>8} {'95% CI':>24}")
+    print(f"  {'-'*10} {'-'*30} {'-'*8} {'-'*24}")
+
+    analysis = {}
+    for metric in ["msci", "cmsci"]:
+        metric_by_cond = aggregate_by_prompt(valid, group_key="condition", value_key=metric)
+        for pert in ["wrong_image", "wrong_audio"]:
+            if "baseline" not in metric_by_cond or pert not in metric_by_cond:
+                continue
+            result = paired_ttest(
+                metric_by_cond["baseline"],
+                metric_by_cond[pert],
+                alpha=alpha,
+                alternative="greater",
+            )
+            d_ci = cohens_d_ci(result.effect_size, result.n, alpha=alpha)
+            ci_str = f"[{d_ci['ci_lower']:.2f}, {d_ci['ci_upper']:.2f}]"
+            sig = "*" if result.significant else ""
+            print(
+                f"  {metric:<10} baseline vs {pert:<16} {result.effect_size:>8.3f} {ci_str:>24} {sig}"
+            )
+            analysis[f"{metric}_{pert}"] = result.to_dict()
+
+    # Correlation between MSCI and cMSCI
+    msci_arr = np.array([r["msci"] for r in valid])
+    cmsci_arr = np.array([r["cmsci"] for r in valid])
+    from scipy.stats import pearsonr, spearmanr
+    r_p, p_p = pearsonr(msci_arr, cmsci_arr)
+    r_s, p_s = spearmanr(msci_arr, cmsci_arr)
+    print(f"\n  MSCI-cMSCI CORRELATION")
+    print(f"    Pearson r  = {r_p:.4f} (p = {p_p:.2e})")
+    print(f"    Spearman ρ = {r_s:.4f} (p = {p_s:.2e})")
+    analysis["correlation"] = {"pearson_r": r_p, "spearman_rho": r_s}
+
+    # Variant distribution
+    variants = [r.get("cmsci_variant", "?") for r in valid]
+    from collections import Counter
+    vc = Counter(variants)
+    print(f"\n  ACTIVE VARIANT DISTRIBUTION:")
+    for v, count in sorted(vc.items()):
+        print(f"    {v}: {count} ({100*count/len(variants):.0f}%)")
+
+    print("\n" + "=" * 90)
+    return analysis
 
 
 def main():

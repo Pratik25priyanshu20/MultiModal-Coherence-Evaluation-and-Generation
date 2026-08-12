@@ -3,12 +3,18 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
+dist/
+build/
+
+# Environment
 .env
 .venv/
 venv/
 
 # OS
 .DS_Store
+Thumbs.db
 
 # HuggingFace / models / cache
 .cache/
@@ -28,3 +34,22 @@ outputs/
 # IDE
 .vscode/
 .idea/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temp files
+temp_*.py
+
+# Claude Code
+.claude/
+
+# cmsci-package bundled assets (the pip package ships its trained weights)
+!cmsci-package/cmsci/assets/models/
+!cmsci-package/cmsci/assets/models/**
+data/bridge_training/combined_training_v2.npz

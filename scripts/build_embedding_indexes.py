@@ -179,6 +179,61 @@ def build_audio_index() -> None:
         print(f"  {domain}: {count}")
 
 
+def build_projected_audio_index(
+    exmcr_weights_path: str = "models/exmcr/ex_clap.pt",
+) -> None:
+    """
+    Build audio index projected into CLIP space via Ex-MCR.
+
+    Only runs if Ex-MCR weights are available. The projected index enables
+    3-way Gramian volume computation in the cMSCI engine.
+    """
+    from pathlib import Path as P
+    weights = P(exmcr_weights_path)
+    if not weights.exists():
+        print(f"Ex-MCR weights not found: {exmcr_weights_path} — skipping projected index")
+        return
+
+    # Load existing audio index
+    audio_index = P(OUT_DIR / "audio_index.npz")
+    if not audio_index.exists():
+        print("Audio index not found — build it first")
+        return
+
+    from src.embeddings.space_alignment import ExMCRProjector
+    projector = ExMCRProjector(weights_path=exmcr_weights_path)
+    if projector.is_identity:
+        print("Ex-MCR in identity mode — projected index would be identical, skipping")
+        return
+
+    data = np.load(audio_index, allow_pickle=True)
+    ids = data["ids"]
+    embs = data["embs"]
+    domains = data["domains"]
+
+    print(f"Projecting {len(ids)} audio embeddings into CLIP space...")
+    projected = projector.project_audio_batch(embs)
+
+    np.savez_compressed(
+        OUT_DIR / "audio_index_projected.npz",
+        ids=ids,
+        embs=projected,
+        domains=domains,
+    )
+    print(f"Projected audio index built: {len(ids)} entries → {OUT_DIR / 'audio_index_projected.npz'}")
+
+
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Build embedding indexes")
+    parser.add_argument("--projected", action="store_true",
+                        help="Also build Ex-MCR projected audio index")
+    parser.add_argument("--exmcr-weights", default="models/exmcr/ex_clap.pt",
+                        help="Path to Ex-MCR weights")
+    args = parser.parse_args()
+
     build_image_index()
     build_audio_index()
+
+    if args.projected:
+        build_projected_audio_index(args.exmcr_weights)

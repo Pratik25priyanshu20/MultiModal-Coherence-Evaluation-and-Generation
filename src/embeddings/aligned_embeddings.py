@@ -9,6 +9,12 @@ from src.embeddings.image_embedder import ImageEmbedder
 from src.embeddings.projection import ProjectionHead
 from src.embeddings.text_embedder import TextEmbedder
 from src.utils.cache import EmbeddingCache
+from src.config.settings import (
+    AUDIO_USE_WINDOWED,
+    AUDIO_WINDOW_SEC,
+    AUDIO_HOP_SEC,
+    AUDIO_AGGREGATION,
+)
 
 
 class AlignedEmbedder:
@@ -33,6 +39,8 @@ class AlignedEmbedder:
         target_dim: int = 512,
         enable_cache: bool = True,
         cache_dir: str = ".cache/embeddings",
+        use_windowed_audio: bool = AUDIO_USE_WINDOWED,
+        audio_aggregation: str = AUDIO_AGGREGATION,
     ):
         self.text = TextEmbedder()       # CLIP text encoder
         self.image = ImageEmbedder()     # CLIP image encoder
@@ -42,6 +50,17 @@ class AlignedEmbedder:
         self.text_proj = ProjectionHead(512, target_dim)
         self.image_proj = ProjectionHead(512, target_dim)
         self.audio_proj = ProjectionHead(512, target_dim)
+
+        # Windowed CLAP settings
+        self._use_windowed = use_windowed_audio
+        self._audio_aggregation = audio_aggregation
+        self._audio_analyzer = None
+        if self._use_windowed:
+            from src.embeddings.audio_analysis import AudioAnalyzer
+            self._audio_analyzer = AudioAnalyzer(
+                window_sec=AUDIO_WINDOW_SEC,
+                hop_sec=AUDIO_HOP_SEC,
+            )
 
         self.cache: Optional[EmbeddingCache] = None
         if enable_cache:
@@ -93,17 +112,32 @@ class AlignedEmbedder:
         return projected
 
     def embed_audio(self, path: str) -> np.ndarray:
-        """CLAP audio embedding — use for text-audio comparison."""
+        """CLAP audio embedding — use for text-audio comparison.
+
+        When windowed mode is enabled, splits audio into overlapping windows,
+        embeds each with CLAP, and aggregates (max or mean). Uses a distinct
+        cache key to avoid collisions with single-clip embeddings.
+        """
+        cache_key = f"audio_windowed_{self._audio_aggregation}" if self._use_windowed else "audio"
+
         if self.cache:
-            cached = self.cache.get(path, "audio")
+            cached = self.cache.get(path, cache_key)
             if cached is not None:
                 return cached
 
-        emb = self.audio.embed(path)
+        if self._use_windowed and self._audio_analyzer is not None:
+            emb = self._audio_analyzer.embed_windowed(
+                path,
+                embedder=self.audio,
+                aggregation=self._audio_aggregation,
+            )
+        else:
+            emb = self.audio.embed(path)
+
         projected = self.audio_proj.project(emb)
 
         if self.cache:
-            self.cache.set(path, "audio", projected)
+            self.cache.set(path, cache_key, projected)
 
         return projected
 

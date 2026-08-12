@@ -1,0 +1,419 @@
+% ============================================================================
+% REPLACEMENT TEXT FOR paper_v2.tex — swap range: line 806 through line 1216
+% (i.e., everything AFTER the v2 hyperparameter table \end{table} at L804,
+%  up to and including the final "publicly available" sentence at L1216).
+% Story rewritten for n = 100: v1 is the headline result (rho = 0.790),
+% the ensemble TIES v1 (no rescue narrative), and adaptive weighting —
+% not calibration alone — is the decisive v1 component.
+% Markers:  %% GPU-PASS = leave until AudioCaps re-run   %% PROF = wording call
+% ============================================================================
+
+Two findings stand out. First, the optimized $\gamma_{\mathrm{MRL}} = 0.7$ indicates that Matryoshka Scale Consistency carries a substantial share of the adaptive channel modulation: most of the per-sample weighting signal comes from cross-scale stability rather than fixed weights. Second, $\alpha = 20$ (versus $\alpha = 1$ in v1) reflects the different magnitude of contrastive margins in the Gemini space, where margin values are smaller and require greater amplification.
+
+LOO-CV yields $\rho = 0.577$ for v2 alone.
+
+\subsection{Use Case: Zero Training API Evaluation (UC2)}\label{sec:uc2}
+
+cMSCI v2 targets scenarios where simplicity and cost matter more than peak accuracy, such as rapid prototyping, research surveys comparing many models, or deployment in environments without GPU access:
+
+\begin{table}[t]
+\caption{UC2 zero training evaluation.}\label{tab:uc2}
+\centering
+\begin{tabular}{ll}
+\toprule
+Property & Value \\
+\midrule
+Spearman $\rho$ with human ratings & 0.544 ($p < 0.001$) \\
+Trainable parameters & 0 \\
+API cost (100 samples) & \$0.01 \\
+GPU required & No \\
+Setup time & Minutes (API key only) \\
+Inference latency & 0.9 ms per sample (excl.\ API latency) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Despite requiring no training and no local models, v2 achieves a statistically significant correlation ($\rho = 0.544$, $p < 0.001$) that exceeds established metrics such as CLIPScore+CLAPScore ($\rho = 0.433$). It does not, however, match the strongest simple baseline (cosine + z-norm, $\rho = 0.712$), so v2 is best understood as trading accuracy for zero training cost and minimal infrastructure. The cost of evaluating 100 samples is \$0.01, making large scale evaluation economically feasible.
+
+%% ============================================================
+\section{cMSCI v3: Multi Backbone Ensemble}\label{sec:v3}
+
+\subsection{Complementary Error Profiles}\label{sec:v3-errors}
+
+The motivation for ensembling v1 and v2 is that the two instantiations rest on fundamentally different representations, and their errors are only partially shared. We quantify this via the Pearson correlation between v1 and v2 residuals (predicted score minus human score):
+
+\begin{equation}\label{eq:error-corr}
+r_{\mathrm{error}} = \mathrm{Pearson}(\hat{c}_{v1} - c_{\mathrm{human}}, \; \hat{c}_{v2} - c_{\mathrm{human}}) = 0.291
+\end{equation}
+
+The low-to-moderate correlation indicates that a substantial fraction of the two models' errors are independent, which is the textbook precondition for an ensemble gain. The perturbation profiles, however, are not symmetric: v1 detects both perturbation types with large effect sizes ($d = 3.19$ wrong-image, $d = 2.74$ wrong-audio), while v2 is competitive on visual incoherence ($d = 2.33$) but nearly blind to audio incoherence ($d = 0.32$). v2 therefore offers little corrective signal on the samples where correction matters most, and — as the following sections show — the decorrelated errors do not translate into a measurable ensemble gain on this evaluation set.
+
+\subsection{Ensemble Formulation}\label{sec:v3-formulation}
+
+The ensemble score is a simple convex combination of the two instantiation scores:
+
+\begin{equation}\label{eq:v3-ensemble}
+\mathrm{cMSCI}_{v3} = w_{v1} \cdot \mathrm{cMSCI}_{v1} + (1 - w_{v1}) \cdot \mathrm{cMSCI}_{v2}
+\end{equation}
+
+Each component score is computed independently using its own backbone, calibration parameters, and component pipeline. No joint training or fine-tuning is performed; the ensemble operates purely at the score level.
+
+\subsection{Weight Selection}\label{sec:v3-weight}
+
+The ensemble weight $w_{v1}$ is selected via LOO-CV on 100 human-rated samples. The optimal weight is:
+
+\begin{equation}\label{eq:v3-weight-opt}
+w_{v1}^{*} = 0.88
+\end{equation}
+
+assigning 88\% weight to v1 and only 12\% to v2. The optimizer collapses toward the stronger backbone: the LOO-CV surface is essentially flat for $w_{v1} \geq 0.8$, and the resulting ensemble performs on par with v1 alone. LOO-CV for the ensemble yields $\rho = 0.770$, identical to v1 alone ($\rho = 0.770$) and well above v2 alone ($\rho = 0.577$); on the full sample the ensemble reaches $\rho = 0.790$, tying v1 ($\rho = 0.790$) rather than exceeding it. In other words, at $n = 100$ the ensemble does not buy additional correlation over the best single backbone — but it also does not cost any, a point we return to in Section~\ref{sec:ensemble-discussion}.
+
+\subsection{Use Case: High Stakes Model Selection (UC3)}\label{sec:uc3}
+
+cMSCI v3 targets applications where errors have high cost, such as selecting the best multimodal generation model from a candidate set, or certifying content quality for production deployment:
+
+\begin{table}[t]
+\caption{UC3 high-stakes model selection. Critical failure = rank error $\geq$ one third of the ranked set.}\label{tab:uc3}
+\centering
+\begin{tabular}{llll}
+\toprule
+Metric & v3 (ensemble) & v1 & v2 \\
+\midrule
+Spearman $\rho$ & 0.790 & 0.790 & 0.544 \\
+Pairwise accuracy & 79.7\% & 79.8\% & 69.1\% \\
+Kendall $\tau$ & 0.590 & 0.595 & 0.382 \\
+Mean rank error & 13.8 & 13.9 & 22.2 \\
+Critical failure rate & 9\% & 9\% & 23\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across every metric, v3 and v1 are statistically indistinguishable: correlations tie at $\rho = 0.790$, pairwise accuracy differs by 0.1 points, and both maintain a 9\% critical failure rate versus v2's 23\%. The practical reading is that the ensemble inherits v1's accuracy rather than improving on it. Its value in high-stakes settings is therefore operational rather than statistical: v3 provides redundancy across two independent embedding backbones (a local CLIP+CLAP stack and an API-based Gemini stack), so scoring degrades gracefully rather than failing outright if one backbone becomes unavailable or its embedding service changes. Teams for whom that redundancy is not relevant should simply deploy v1.
+
+\section{Experimental Setup}\label{sec:experimental-setup}
+
+\subsection{Evaluation Data}\label{sec:eval-data}
+
+\begin{itemize}
+
+\item \textbf{Human rated evaluation set.}
+91 unique scene descriptions spanning four environmental domains, evaluated under three conditions: baseline (matched image + audio), wrong-image (cross-domain mismatched image), and wrong-audio (cross domain mismatched audio). This yields 100 evaluation triples (34 baseline / 33 wrong-image / 33 wrong-audio; by domain: nature 25, urban 30, water 10, mixed 35). Images are generated by Stable Diffusion 1.5 \citep{rombach2022high}; audio is retrieved via CLAP similarity from an index of 104 audio files. Five independent raters scored each sample on a 1--5 Likert scale. Inter rater reliability: ICC(3,k) = 0.872 (good), Krippendorff's $\alpha$ = 0.701 (acceptable).
+
+\item \textbf{External benchmark.}
+100 AudioCaps samples \citep{kim2019audiocaps} with human written captions, used for matched/mismatched discrimination (200 pairs). Each original caption audio pair is a positive; a randomly shuffled pairing serves as a negative.
+%% GPU-PASS: after the 1,000-clip re-run, update to "1,000 AudioCaps samples ... (2,000 pairs)" together with the AudioCaps results table below.
+
+\item \textbf{Training data.}
+10,255 embedding pairs for v1 components: OmniBench (1,051), AudioCaps (1,000), and augmented (8,204). v2 requires no training data.
+
+\end{itemize}
+
+\subsection{Baselines}\label{sec:baselines}
+
+We compare cMSCI against ten baseline methods spanning four categories:
+
+\begin{table}[t]
+\caption{Baseline methods.}\label{tab:baselines}
+\centering
+\small
+\begin{tabular}{llp{4.2cm}l}
+\toprule
+Method & Category & Description & Audio \\
+\midrule
+MSCI (raw cosine) & Simple & Weighted mean of CLIP and CLAP cosine sim. & Yes \\
+Raw cosine & Simple & Unweighted mean of CLIP and CLAP cosine sim. & Yes \\
+Cosine + z-norm & Simple & Z-normalized cosine sim.\ mapped through sigmoid & Yes \\
+Concat.\ cosine & Simple & Concatenated CLIP+CLAP embeddings, single cosine & Yes \\
+Retrieval rank & Simple & Reciprocal rank of matched item among candidates & Yes \\
+CLIPScore + CLAPScore & Established & Standard CLIP text--image + CLAP text--audio & Yes \\
+BLIPScore + CLAPScore & Established & BLIP ITM probability + CLAPScore & Yes \\
+CCA & Joint & CCA projecting CLIP and CLAP into shared subspace & Yes \\
+Regularized CCA & Joint & Ridge regularized CCA for small sample stability & Yes \\
+LLaVA-7B (VLM) & VLM & VLM rating via chain of thought on 1--5 scale & Partial \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All baselines that include an audio channel use CLAP for text--audio similarity. CLIPScore is presented with CLAPScore augmentation for fair tri modal comparison. The VLM judge processes the image directly and the audio via a spectrogram representation, but lacks native audio understanding. BLIPScore + CLAPScore was evaluated on the original 30-sample subset but has not yet been recomputed on the full 100-sample set; it is therefore excluded from the main comparison table.
+%% PROF: alternatively keep BLIP in the table with its 30-sample value and a footnote — your call.
+
+\subsection{Evaluation Protocol}\label{sec:eval-protocol}
+
+\begin{itemize}
+
+\item \textbf{Primary metric.}
+Spearman's rank correlation ($\rho$) between automatic metric scores and mean human coherence ratings (averaged across five raters per sample).
+
+\item \textbf{Statistical significance.}
+Two-sided $p$-values from Spearman's test with significance threshold $\alpha = 0.05$.
+
+\item \textbf{Secondary metrics.}
+Kendall's $\tau$ for ordinal agreement, pairwise accuracy for relative ranking, mean rank error for positional accuracy.
+
+\item \textbf{Effect sizes.}
+Cohen's $d$ with 95\% confidence intervals for perturbation experiments.
+
+\item \textbf{Discrimination.}
+Area under the ROC curve (AUC) and classification accuracy for matched versus mismatched pairs on external benchmarks.
+
+\item \textbf{Cross validation.}
+All hyperparameters are selected via LOO-CV on the full 100-sample set (an unbiased procedure that uses each sample once as held out). The dev/test split (70 dev, 30 test, stratified by domain $\times$ condition, seed = 2024) provides additional held-out validation.
+
+\item \textbf{Robustness.}
+Seed stability analysis (10 seeds), hyperparameter sensitivity via one at a time sweeps, and leave one out cross validation (LOO-CV).
+
+\item \textbf{Reproducibility.}
+All experiments use single clip CLAP embedding (no windowing), deterministic inference, and fixed random seeds. Complete configuration is specified in \texttt{src/config/settings.py}.
+
+\end{itemize}
+
+\section{Results}\label{sec:results}
+
+\subsection{Main Comparison}\label{sec:main-comparison}
+
+\begin{table}[t]
+\caption{Spearman correlation with human coherence judgments ($n = 100$, 5 raters). 95\% confidence intervals via bootstrap resampling (10,000 iterations).}\label{tab:main-comparison}
+\centering
+\small
+\begin{tabular}{clllll}
+\toprule
+Rank & Method & $\rho$ & 95\% CI & $p$ & Sig. \\
+\midrule
+\textbf{1} & \textbf{cMSCI v3 (ens.)} & \textbf{0.790} & \textbf{[0.682, 0.862]} & \textbf{$<$0.001} & \textbf{Yes} \\
+\textbf{1} & \textbf{cMSCI v1 (CLIP+CLAP)} & \textbf{0.790} & \textbf{[0.680, 0.861]} & \textbf{$<$0.001} & \textbf{Yes} \\
+3 & Cosine + z-norm & 0.712 & [0.580, 0.804] & $<$0.001 & Yes \\
+4 & Raw cosine & 0.558 & [0.403, 0.676] & $<$0.001 & Yes \\
+5 & MSCI (raw cosine) & 0.556 & [0.400, 0.678] & $<$0.001 & Yes \\
+6 & Concat.\ cosine & 0.547 & [0.395, 0.674] & $<$0.001 & Yes \\
+7 & cMSCI v2 (Gemini) & 0.544 & [0.390, 0.672] & $<$0.001 & Yes \\
+8 & Regularized CCA & 0.494 & [0.315, 0.641] & $<$0.001 & Yes \\
+9 & CLIPScore + CLAPScore & 0.433 & [0.269, 0.578] & $<$0.001 & Yes \\
+10 & Retrieval rank & 0.394 & [0.221, 0.540] & $<$0.001 & Yes \\
+11 & CCA & 0.163 & [$-$0.053, 0.364] & 0.106 & No \\
+12 & LLaVA-7B (VLM) & 0.115 & [$-$0.077, 0.302] & 0.254 & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+cMSCI v1 and the v3 ensemble share the top rank at $\rho = 0.790$ ($p < 0.001$), a margin of $+0.078$ over the strongest baseline (cosine + z-norm, $\rho = 0.712$) and $+0.234$ over the uncalibrated MSCI baseline ($\rho = 0.556$). All three cMSCI variants are statistically significant, as are ten of the twelve methods overall; at $n = 100$ the evaluation has sufficient power that even simple baselines reach significance, which makes the \emph{ordering} of methods, rather than significance alone, the informative comparison. That ordering supports the paper's central claim: the two methods that calibrate their scores against reference distributions (cMSCI at 0.790 and cosine + z-norm at 0.712) clearly separate from every uncalibrated method (all $\rho \leq 0.558$), confirming that calibration, not the embedding backbone, is the critical differentiator.
+
+Notably, the VLM as judge baseline (LLaVA-7B, $\rho = 0.115$) is not statistically significant despite requiring a 7-billion-parameter model at inference time; cMSCI v1 outperforms it by $+0.675$ $\rho$ while using only lightweight geometric computations. The concatenated cosine baseline ($\rho = 0.547$) is a reasonably competitive simple method, but cMSCI v1 exceeds it by $+0.243$ $\rho$. Among the joint-projection methods, regularized CCA reaches significance ($\rho = 0.494$) while plain CCA does not ($\rho = 0.163$), consistent with the regularizer controlling overfitting of the learned projections on a modest sample.
+
+\subsection{Component Ablation}\label{sec:ablation}
+
+\begin{table}[t]
+\caption{v1 component ablation.}\label{tab:v1-ablation}
+\centering
+\begin{tabular}{llll}
+\toprule
+Configuration & Spearman $\rho$ & $\Delta\rho$ & Sig. \\
+\midrule
+MSCI (cosine baseline) & 0.558 & -- & Yes \\
++ Gramian volume & 0.485 & $-$0.073 & Yes \\
++ z-score calibration & 0.505 & +0.020 & Yes \\
++ contrastive margin & 0.499 & $-$0.006 & Yes \\
++ ExMCR complementarity & 0.493 & $-$0.006 & Yes \\
++ adaptive weighting (full v1) & 0.790 & +0.297 & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{v2 component ablation. The ablation endpoint uses the engine reference configuration; the deployed v2 configuration reported in Table~\ref{tab:main-comparison} yields $\rho = 0.544$.}\label{tab:v2-ablation}
+\centering
+\begin{tabular}{llll}
+\toprule
+Configuration & Spearman $\rho$ & $\Delta\rho$ & Sig. \\
+\midrule
+Raw cosine average & 0.433 & -- & Yes \\
++ Gramian volume & 0.383 & $-$0.050 & Yes \\
++ z-score calibration & 0.495 & +0.112 & Yes \\
++ contrastive margins & 0.580 & +0.085 & Yes \\
++ Matryoshka adaptive (full v2) & 0.572 & $-$0.008 & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+%% PROF: v2 ablation endpoint (0.572, engine reference config) vs deployed headline (0.544) — the caption
+%% discloses the config difference; confirm you are comfortable with this, or we re-run the ablation
+%% under the deployed config so the endpoint is exactly 0.544.
+
+The two ablations tell complementary stories. In v1, the intermediate geometric stages hover at or slightly below the cosine baseline ($\rho \approx 0.49$--$0.51$ versus 0.558), and the decisive step is uncertainty-aware adaptive weighting, which adds $+0.297$ and lifts the full metric to $\rho = 0.790$. This indicates that the components are not additive in isolation: the calibrated z-scores, margins, and complementarity signal become valuable primarily as inputs that the adaptive weighting mechanism can exploit per sample. In v2, where no trained uncertainty adapters exist, z-score calibration is the largest single contributor ($+0.112$), followed by contrastive margins ($+0.085$); Matryoshka adaptive weighting is approximately neutral on average ($-0.008$) while providing the per-sample confidence signal used at deployment. Across both backbones, the common pattern is that raw geometric formulations (Gramian volume alone) do not improve over cosine similarity — the gains come from the calibration-and-weighting machinery built on top of the geometry.
+
+\subsection{Perturbation Sensitivity}\label{sec:perturbation-sensitivity}
+
+Effect sizes quantify each variant's ability to detect specific types of incoherence:
+
+\begin{table}[t]
+\caption{Perturbation effect sizes (Cohen's $d$, baseline vs.\ perturbation condition).}\label{tab:perturbation}
+\centering
+\begin{tabular}{lll}
+\toprule
+Variant & Wrong-image $d$ & Wrong-audio $d$ \\
+\midrule
+cMSCI v1 & 3.19 & 2.74 \\
+cMSCI v2 & 2.33 & 0.32 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+v1 exhibits very large effect sizes in both channels ($d = 3.19$ wrong-image, $d = 2.74$ wrong-audio); the strong audio channel is attributable to the 10,255-pair training set that includes real AudioCaps audio-caption pairs. v2 detects visual incoherence with a large effect ($d = 2.33$) but is nearly insensitive to audio perturbations ($d = 0.32$), reflecting its heavily text-image-weighted configuration ($w_{ti} = 0.85$) and the limited discriminative variance of the Gemini space's audio-facing channels on this data. This one-sided sensitivity explains both v2's lower overall correlation and why the ensemble optimizer assigns v2 little weight: on the samples where v1 errs most (audio perturbations), v2 has little corrective signal to offer.
+
+\subsection{External Benchmark (AudioCaps)}\label{sec:audiocaps}
+
+%% GPU-PASS: this entire subsection updates as one consistent set after the 1,000-clip re-run
+%% (count -> 1,000 samples / 2,000 pairs; AUC -> 0.969; F1 / FPR@95 / Cohen's d from the re-run).
+\begin{table}[t]
+\caption{AudioCaps matched/mismatched discrimination (100 samples, 200 pairs).}\label{tab:audiocaps}
+\centering
+\begin{tabular}{ll}
+\toprule
+Metric & cMSCI v1 \\
+\midrule
+AUC & 0.993 \\
+F1 score & 0.975 \\
+Cohen's $d$ & 3.35 \\
+FPR @ 95\% TPR & 2\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The near ceiling AUC (0.993) and massive effect size ($d = 3.35$) confirm that cMSCI v1 generalizes beyond the curated evaluation set. The external benchmark uses real world audio-caption pairs rather than domain-controlled perturbations, testing whether the metric can discriminate genuine multimodal coherence from random pairings in the wild.
+
+\subsection{Robustness}\label{sec:robustness}
+
+\textbf{Seed stability.} Running v1 with 10 different random seeds produces identical results ($\rho = 0.790 \pm 0.000$, 10/10 significant at $p < 0.05$). The zero variance confirms that the metric is fully deterministic given the same inputs and model weights.
+
+\textbf{Hyperparameter sensitivity.} One at a time sweeps across each of the four main hyperparameters ($\alpha$, $w_{ti}$, $w_{3d}$, $\gamma$) confirm a broad performance plateau: all tested configurations across all four sweeps produce significant correlations ($p < 0.05$). The narrowest sensitivity range is $w_{ti}$ (spread = 0.067), and the widest is $\gamma$ (spread = 0.197), indicating that the adaptive mixing coefficient has the largest marginal impact but that no single hyperparameter dominates performance.
+%% PROF: the sweep spreads (0.067 / 0.197) are from the earlier sensitivity run — re-verify on the
+%% 100-sample re-run of scripts/run_sensitivity.py before camera-ready.
+
+\textbf{Per-domain analysis.} v1 performance varies by domain: urban scenes achieve the highest correlation ($\rho = 0.822$), likely because urban environments have highly distinctive visual and auditory signatures (traffic noise, city skylines) that create large cosine gaps between matched and mismatched content.
+
+\subsection{Ensemble Analysis}\label{sec:ensemble-analysis}
+
+\begin{table}[t]
+\caption{Ensemble diagnostics. Critical failure = rank error $\geq$ one third of the ranked set.}\label{tab:ensemble-diag}
+\centering
+\begin{tabular}{ll}
+\toprule
+Metric & Value \\
+\midrule
+Error decorrelation (Pearson $r$) & 0.291 \\
+Optimal ensemble weight ($w_{v1}$) & 0.88 \\
+v1 critical failure rate & 9\% \\
+v2 critical failure rate & 23\% \\
+v3 critical failure rate & 9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The diagnostics explain why the ensemble matches, but does not exceed, its stronger member. The error decorrelation ($r = 0.291$) is low enough that independent errors exist in principle, but two factors prevent the ensemble from converting them into a gain. First, the errors that v2 could correct are concentrated in samples where v2 itself is unreliable: its critical failure rate (23\%) is more than double v1's (9\%), and its failures cluster on audio perturbed samples where v1 errs too. Second, the accuracy gap between the members is large ($\rho = 0.790$ versus $0.544$), so the optimizer protects the stronger model, pushing $w_{v1}$ to 0.88 and leaving v2 as a minor perturbation of v1's scores. The result is an ensemble that tracks v1 almost exactly — same critical failure rate, same correlation. Error decorrelation is a necessary but not sufficient condition for ensemble gains; the weaker member must also be reliable on the samples where the stronger member fails, and on this evaluation set it is not.
+
+\subsection{Qualitative Case Studies}\label{sec:case-studies}
+
+We present three case studies illustrating the behavior of the variants across conditions:
+%% PROF: per-sample scores below are from the earlier run — re-extract v1/v2/v3 and human scores for
+%% S019 / S014 / S010 from the 100-sample results before camera-ready. The qualitative pattern
+%% (v1 detects audio incoherence, v2 does not) is confirmed by the effect sizes in Table perturbation.
+
+\textbf{Case 1: High agreement (S019, baseline condition).} A well matched scene with coherent text, image, and audio. All variants correctly assign high scores, with a slight discount reflecting the metric's calibration against the population (perfect scores are rare). This case confirms basic validity: the metrics agree with humans on unambiguous positive examples.
+
+\textbf{Case 2: Image incoherence detected (S014, wrong-image condition).} A nature text prompt paired with a mismatched urban image and correct nature audio. Both v1 and v2 detect the visual mismatch, assigning scores well below the human mean. The human score is somewhat higher than the automatic scores, suggesting that raters partially credited the correct audio channel — a compensation the metrics apply more conservatively.
+
+\textbf{Case 3: Audio incoherence, v1--v2 divergence (S010, wrong-audio condition).} A nature scene with correct image but mismatched urban audio. v1 correctly detects the audio incoherence (its score drops sharply from baseline), while v2 assigns a moderate score that fails to reflect the perturbation. This is the prototypical illustration of the perturbation asymmetry in Table~\ref{tab:perturbation}: v2's weak audio channel leaves it blind to exactly the perturbation type that v1's trained audio components were built to detect. It also illustrates why the v1-heavy ensemble weight is the right choice — averaging v2's inflated score into v1's correct one can only dilute the detection.
+
+\section{Discussion}
+
+\subsection{Why Calibration and Adaptive Weighting are the Critical Enablers}\label{sec:calibration-discussion}
+
+At $n = 100$, the ablations sharpen the paper's central claim. The raw geometric formulation is not the source of the gains: Gramian volume alone performs slightly \emph{below} plain cosine similarity in both backbones. What separates cMSCI from the uncalibrated baselines is the machinery layered on top — z-score calibration, which makes scores from heterogeneous spaces commensurable, and uncertainty-aware adaptive weighting, which decides per sample how much to trust each channel. In v2, calibration is the largest single contributor ($+0.112$); in v1, the calibrated components deliver their value jointly through adaptive weighting, whose activation adds $+0.297$ and carries the metric from $\rho \approx 0.49$ to $0.790$. The main comparison table shows the same effect from the outside: the only baseline that calibrates (cosine + z-norm) is also the only baseline above $\rho = 0.6$.
+
+The mechanism is straightforward but its impact is large: raw similarity scores from different embedding spaces (CLIP vs.\ CLAP) or different channels (text-image vs.\ text-audio) have different scale properties, so a cosine similarity of 0.35 in CLIP space carries different semantic import than 0.35 in CLAP space. Calibration against reference distributions makes these channels commensurable, and once commensurable, they can be adaptively weighted. This has practical implications beyond our specific metric: any multimodal evaluation that combines scores from heterogeneous embedding spaces should calibrate those scores before aggregating them. The calibration statistics are cheap to compute (a one time pass over baseline data) and the improvement is substantial.
+
+\subsection{Cross Modal Complementarity}\label{sec:complementarity-discussion}
+
+The sign flip in ExMCR complementarity — where greater image-audio Gramian \emph{dispersion} (not coherence) correlates with human judgments — challenges the intuitive assumption that all channels should point in the same direction. The finding suggests that humans perceive multimodal content as richer and more coherent when each modality contributes unique semantic information rather than redundantly encoding the same concept. A beach scene is perceived as more coherent when the image shows the visual landscape and the audio captures wave sounds than when both modalities encode the same abstract ``beach ness.''
+
+On the 100-sample evaluation, however, the complementarity signal's marginal contribution is modest: the optimizer retains it with a small weight ($w_{3d} = 0.15$ in v1), and its ablation stage is approximately neutral in isolation, contributing value only in combination with adaptive weighting. In v2 the signal is eliminated entirely ($w_{\mathrm{compl}} = 0.00$). Its utility evidently depends on the quality and variance of the cross space projection: when the projection is approximate (ExMCR in v1), the signal carries information but also noise; when the projection is exact but the channel lacks discriminative variance (Gemini in v2), the signal is simply uninformative. We retain the component for its interpretive value — the sign flip is a finding about human perception, not merely a scoring trick — while noting that it is not a primary driver of correlation.
+
+\subsection{Anatomy of a Unified Embedding Space}\label{sec:anatomy-unified}
+
+cMSCI v2's results reveal an unexpected property of the Gemini unified embedding space: the image-audio channel carries the lowest discriminative variance of the three channels, making it largely uninformative for coherence evaluation despite being directly computable. The optimizer responds by eliminating it entirely ($w_{ia} = 0.00$, $w_{\mathrm{compl}} = 0.00$): the text-image and text-audio channels carry the usable signal, while image-audio similarity varies too little across matched and mismatched pairings to discriminate between them.
+%% PROF: recomputed channel SDs are 0.051 (ia) / 0.090 (ti) / 0.146 (ta) — cite them here if you want
+%% exact values; "near zero" from the 30-sample run is no longer accurate, "lowest variance" is.
+
+We hypothesize that this reflects the training distribution of the underlying model. Unified embedding models are typically trained on text-paired data (text-image, text-audio) rather than directly on image-audio pairs. The model learns to align each modality with text as the anchor, but the image-audio relationship is an emergent property rather than a directly optimized objective. For scene level evaluation where images and audio clips often depict broadly similar environmental categories (nature, urban, water), the emergent image audio similarity is high and relatively invariant, lacking the discriminative variance needed for coherence evaluation.
+
+This finding cautions against assuming that unified embedding spaces automatically solve the cross modal comparison problem. The mathematical possibility of computing image-audio similarity does not guarantee its informative value.
+
+\subsection{What the Ensemble Does and Does Not Buy}\label{sec:ensemble-discussion}
+
+The ensemble result is a negative finding worth stating plainly: combining two backbones with partially decorrelated errors ($r = 0.291$) did not improve on the stronger backbone alone ($\rho = 0.790$ for both v3 and v1). Three observations explain why, and delimit when multi-backbone ensembling should be expected to help:
+
+\begin{enumerate}
+\item \textbf{Decorrelation is not enough.} Ensemble gains require the weaker member to be right where the stronger member is wrong. Here, v2's failures concentrate on audio perturbed samples — the same region where v1's rare errors occur — so v2 offers little usable correction despite the overall decorrelation.
+
+\item \textbf{A large accuracy gap forces a degenerate weight.} With members at $\rho = 0.790$ and $0.544$, the LOO-CV optimizer drives $w_{v1}$ to 0.88, effectively reproducing v1. Ensembling is most promising when the members are closer in accuracy, so the optimizer can afford a genuine mixture.
+
+\item \textbf{The value that remains is operational.} The two instantiations do rest on fundamentally different representations (specialized 512-d dual spaces versus a unified 3072-d space), and v3 packages them behind one score. The benefit is deployment flexibility and backbone redundancy — not accuracy. Since the ensemble matches v1 while never underperforming it, it is a costless hedge for teams already running both backbones, and unnecessary otherwise.
+\end{enumerate}
+
+We consider this an honest and useful boundary result: it shows that the cMSCI pipeline extracts most of the available signal from the stronger backbone, leaving little for a second backbone to add on this evaluation set. Whether the picture changes with a stronger unified-space member (e.g., a future embedding model with an informative image-audio channel) is an open question.
+
+\subsection{Matryoshka Scale Consistency as a General Principle}\label{sec:matryoshka-discussion}
+
+Matryoshka Scale Consistency introduces a general principle for training free uncertainty estimation that extends beyond our specific application. Any Matryoshka-compatible embedding model (an increasingly common property as MRL becomes standard in embedding training) can provide per sample confidence estimates by measuring coherence stability across truncation dimensions. The principle is that information encoded at multiple scales is more robust than information encoded only at the finest scale.
+
+In v2, the optimized $\gamma_{\mathrm{MRL}} = 0.7$ indicates that scale consistency carries most of the adaptive weighting signal, and the full calibrated pipeline lifts v2 from an uncalibrated $\rho = 0.433$ to $\rho = 0.544$. The average correlation contribution of the MRL stage itself is modest, and its primary role is supplying per sample confidence without any trained components. The mechanism can serve as a drop in replacement for ProbVLM style uncertainty estimation in any pipeline that uses Matryoshka compatible embeddings, eliminating the need for probabilistic adapter training — a practical benefit that holds regardless of its marginal effect on average correlation.
+
+\subsection{Practical Deployment Guidance}\label{sec:deployment-guidance}
+
+We recommend the following variant selection based on deployment context:
+
+\textbf{UC1 --- Batch quality gate:} Use cMSCI v1 when accuracy matters most. The 85 ms latency is suitable for offline processing, and the AUC of 0.993 on AudioCaps provides near perfect matched/mismatched discrimination with only 2\% false positive rate at 95\% recall.
+%% GPU-PASS: AUC / FPR here update together with the AudioCaps subsection (real AUC = 0.969 at 1,000 clips).
+
+\textbf{UC2 --- Rapid prototyping / cost-sensitive evaluation:} Use cMSCI v2 when simplicity and cost matter more than peak accuracy. Zero trainable parameters, no GPU requirement, and \$0.01 per 100 samples make v2 suitable for large scale surveys or environments without local compute.
+
+\textbf{UC3 --- Multi backbone deployments:} Use cMSCI v3 when backbone redundancy or flexibility matters — for example, when scoring must continue if the local GPU stack or the embedding API becomes unavailable. v3 matches v1's accuracy ($\rho = 0.790$, 79.7\% pairwise accuracy, 9\% critical failure rate) at the cost of running both backbones; it does not improve on v1, so teams without a redundancy requirement should prefer v1 directly.
+
+For all variants, the calibration statistics should be recomputed when the embedding backbone is updated or when the evaluation domain shifts substantially from the calibration distribution.
+
+\section{Limitations}\label{sec:limitations}
+
+\textbf{Sample size.} The human evaluation set contains 100 samples rated by five independent raters. While the inter rater reliability is good (ICC(3,k) = 0.872, Krippendorff's $\alpha$ = 0.701), the sample size still limits statistical power for distinguishing closely ranked methods (e.g., the v1/v3 tie), and confidence intervals on individual correlations remain wide. The LOO-CV procedure is unbiased but retains nontrivial variance at $n = 100$.
+
+\textbf{Domain coverage.} The evaluation set covers four environmental domains (nature, urban, water, mixed). Performance on other content types (e.g., abstract concepts, indoor scenes, human activities, synthetic media) is not validated. The per-domain analysis shows variation ($\rho_{\mathrm{urban}} = 0.822$ vs.\ overall $\rho = 0.790$), suggesting some domain dependence.
+
+\textbf{English only evaluation.} All text prompts, captions, and audio descriptions are in English. Cross lingual or multilingual coherence evaluation is not addressed.
+
+\textbf{Embedding model dependence.} cMSCI's performance is bounded by the quality of the underlying embedding models. CLIP's 77-token context window truncates long descriptions, and CLAP's audio encoder may not capture fine grained temporal structure. Gemini Embedding 2 is accessed via API, introducing latency variability and dependency on external service availability.
+
+\textbf{Image-audio channel.} Neither v1 nor v2 fully exploits the image-audio relationship. In v1, the Ex-MCR projection is an approximation; in v2, the channel lacks discriminative variance. A stronger image-audio signal would likely improve all variants.
+
+\textbf{Calibration distribution shift.} The z-score calibration statistics are fitted on baseline data from specific domains. If the evaluation domain shifts substantially (e.g., from environmental scenes to medical imaging), recalibration is necessary. We do not evaluate the metric's robustness to calibration distribution shift.
+
+\textbf{Coherence vs.\ quality.} cMSCI measures semantic coherence (whether modalities agree) but not individual modality quality. A blurry image coherently paired with matching text and audio would receive a high cMSCI score despite low visual quality. A complete evaluation system would combine coherence metrics with modality-specific quality metrics.
+
+\textbf{Contrastive margin dependence on index.} The contrastive margin component depends on the negative bank composition (57 images, 104 audio files). A different negative bank could yield different margins and, consequently, different optimal hyperparameters. We do not evaluate sensitivity to negative bank composition.
+
+%% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+
+We presented the calibrated Multimodal Semantic Coherence Index (cMSCI), a geometric framework for evaluating cross modal alignment in text-image-audio content. Our findings support six key conclusions:
+
+\begin{enumerate}
+\item \textbf{Calibration and adaptive weighting, not geometry alone, are the critical enablers.} Gramian volume by itself does not improve over cosine similarity. The gains come from making heterogeneous channels commensurable via z-score calibration and then weighting them per sample by estimated reliability — a combination that lifts correlation from $\rho = 0.558$ (raw cosine) to $\rho = 0.790$. This generalizes: any multimodal evaluation combining scores from different embedding spaces should calibrate before combining.
+
+\item \textbf{The cMSCI framework is embedding-agnostic.} The same pipeline (Gramian volume $\rightarrow$ z-calibration $\rightarrow$ contrastive margins $\rightarrow$ adaptive weighting) produces significant human correlations on two fundamentally different backbones: CLIP+CLAP (v1, $\rho = 0.790$, $p < 0.001$) and Gemini Embedding 2 (v2, $\rho = 0.544$, $p < 0.001$). The framework adapts to the backbone's properties rather than depending on specific model architectures.
+
+\item \textbf{Multi backbone ensembling matches, but does not exceed, the best single backbone.} cMSCI v3 ties v1 at $\rho = 0.790$: despite partially decorrelated errors ($r = 0.291$), the weaker member's failures concentrate on the same samples as the stronger member's, and the LOO-CV weight collapses to $w_{v1} = 0.88$. The ensemble's value is operational — backbone redundancy at no accuracy cost — and the result delimits when cross backbone ensembling is worthwhile.
+
+\item \textbf{Cross modal complementarity is a perceptual signal, if a modest scoring one.} The finding that image-audio Gramian \emph{dispersion} (not coherence) correlates with human judgments challenges the assumption that all channels should point in the same direction: humans perceive multimodal content as more coherent when each modality contributes unique information. Its marginal scoring contribution at $n = 100$ is small ($w_{3d} = 0.15$), but the sign flip itself is a substantive finding about human coherence perception.
+
+\item \textbf{Matryoshka Scale Consistency provides training free uncertainty.} By measuring coherence stability across MRL truncation dimensions, we obtain per sample confidence estimates without probabilistic adapters, training data, or GPU resources. This principle generalizes to any Matryoshka compatible embedding model and represents, to our knowledge, the first use of MRL truncation as an uncertainty signal.
+
+\item \textbf{Unified embedding spaces do not automatically solve cross-modal comparison.} Despite enabling direct image-audio computation, the Gemini unified space carries the lowest discriminative variance in the image-audio channel, and the optimizer eliminates it ($w_{ia} = 0.00$). The mathematical possibility of computing a cross-modal similarity does not guarantee its discriminative value.
+\end{enumerate}
+
+The cMSCI framework, code, trained model weights, and evaluation data are publicly available to support reproducibility and extension to additional modalities and embedding backbones.
