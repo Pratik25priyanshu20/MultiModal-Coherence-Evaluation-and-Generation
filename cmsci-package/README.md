@@ -1,5 +1,9 @@
 # cMSCI — Calibrated Multimodal Semantic Coherence Index
 
+[![PyPI](https://img.shields.io/pypi/v/cmsci)](https://pypi.org/project/cmsci/)
+[![Python](https://img.shields.io/pypi/pyversions/cmsci)](https://pypi.org/project/cmsci/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Score how semantically coherent a **text / image / audio** triple is, with a single
 calibrated metric.
 
@@ -15,13 +19,13 @@ MSCI baseline.
 ## Install
 
 ```bash
-pip install "cmsci @ git+https://github.com/Pratik25priyanshu20/MultiModal-Coherence-Evaluation-and-Generation.git#subdirectory=cmsci-package"
+pip install cmsci
 ```
 
-Or from a local clone:
+Or the latest development version straight from GitHub:
 
 ```bash
-pip install ./cmsci-package
+pip install "cmsci @ git+https://github.com/Pratik25priyanshu20/MultiModal-Coherence-Evaluation-and-Generation.git#subdirectory=cmsci-package"
 ```
 
 All trained artifacts (calibration statistics, Ex-MCR projector, cross-space
